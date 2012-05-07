@@ -1,0 +1,192 @@
+{
+    topic_types: [
+
+        {
+            value: "Account",
+            uri: "dm4.poemspace.account",
+            data_type_uri: "dm4.core.text",
+            index_mode_uris: ["dm4.core.fulltext"]
+        },
+        {
+            value: "Bezirk",
+            uri: "dm4.poemspace.bezirk",
+            data_type_uri: "dm4.core.text",
+            index_mode_uris: ["dm4.core.fulltext"],
+            view_config_topics: [
+                {
+                    type_uri: "dm4.webclient.view_config",
+                    composite: {
+                        dm4.webclient.icon: "/com.poem-space.dm4-poemspace/images/circled-dot.png",
+                        dm4.webclient.add_to_create_menu: true,
+                        dm4.webclient.is_searchable_unit: true
+                    }
+                }
+            ]
+        },
+        {
+            value: "Kiez",
+            uri: "dm4.poemspace.kiez",
+            data_type_uri: "dm4.core.text",
+            index_mode_uris: ["dm4.core.fulltext"],
+            view_config_topics: [
+                {
+                    type_uri: "dm4.webclient.view_config",
+                    composite: {
+                        dm4.webclient.icon: "/com.poem-space.dm4-poemspace/images/dot.png",
+                        dm4.webclient.add_to_create_menu: true,
+                        dm4.webclient.is_searchable_unit: true
+                    }
+                }
+            ]
+        },
+        {
+            value: "Einrichtungsart",
+            uri: "dm4.poemspace.art",
+            data_type_uri: "dm4.core.text",
+            index_mode_uris: ["dm4.core.fulltext"],
+            view_config_topics: [
+                {
+                    type_uri: "dm4.webclient.view_config",
+                    composite: {
+                        dm4.webclient.icon: "/com.poem-space.dm4-poemspace/images/tent.png",
+                        dm4.webclient.add_to_create_menu: true,
+                        dm4.webclient.is_searchable_unit: true
+                    }
+                }
+            ]
+        },
+        {
+            value: "Kunstgattung",
+            uri: "dm4.poemspace.gattung",
+            data_type_uri: "dm4.core.text",
+            index_mode_uris: ["dm4.core.fulltext"],
+            view_config_topics: [
+                {
+                    type_uri: "dm4.webclient.view_config",
+                    composite: {
+                        dm4.webclient.icon: "/com.poem-space.dm4-poemspace/images/butterfly.png",
+                        dm4.webclient.add_to_create_menu: true,
+                        dm4.webclient.is_searchable_unit: true
+                    }
+                }
+            ]
+        },
+        {
+            value: "Distribution List Name",
+            uri: "dm4.poemspace.listname",
+            data_type_uri: "dm4.core.text",
+            index_mode_uris: ["dm4.core.fulltext"]
+        },
+        {
+            value: "Distribution List",
+            uri: "dm4.poemspace.list",
+            data_type_uri: "dm4.core.composite",
+            assoc_defs: [
+                {
+                    part_topic_type_uri:  "dm4.poemspace.listname",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
+                }
+            ],
+            label_config: [
+                dm4.poemspace.listname
+            ],
+            view_config_topics: [
+                {
+                    type_uri: "dm4.webclient.view_config",
+                    composite: {
+                        dm4.webclient.icon: "/com.poem-space.dm4-poemspace/images/lists.png",
+                        dm4.webclient.add_to_create_menu: true,
+                        dm4.webclient.is_searchable_unit: true
+                    }
+                }
+            ]
+        },
+        {
+            value: "Mail From",
+            uri: "dm4.poemspace.from",
+            data_type_uri: "dm4.core.text",
+            index_mode_uris: ["dm4.core.fulltext"]
+        },
+        {
+            value: "Mail To",
+            uri: "dm4.poemspace.to",
+            data_type_uri: "dm4.core.text",
+            index_mode_uris: ["dm4.core.fulltext"]
+        },
+        {
+            value: "Mail Cc",
+            uri: "dm4.poemspace.cc",
+            data_type_uri: "dm4.core.text",
+            index_mode_uris: ["dm4.core.fulltext"]
+        },
+        {
+            value: "Mail Bcc",
+            uri: "dm4.poemspace.bcc",
+            data_type_uri: "dm4.core.text",
+            index_mode_uris: ["dm4.core.fulltext"]
+        },
+        {
+            value: "Mail Subject",
+            uri: "dm4.poemspace.subject",
+            data_type_uri: "dm4.core.text",
+            index_mode_uris: ["dm4.core.fulltext"]
+        },
+        {
+            value: "Mail Body",
+            uri: "dm4.poemspace.body",
+            data_type_uri: "dm4.core.text",
+            index_mode_uris: ["dm4.core.fulltext"]
+        },
+        {
+            value: "Mail",
+            uri: "dm4.poemspace.mail",
+            data_type_uri: "dm4.core.composite",
+            assoc_defs: [
+                {
+                    part_topic_type_uri:  "dm4.poemspace.from",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
+                },
+                {
+                    part_topic_type_uri:  "dm4.poemspace.to",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
+                },
+                {
+                    part_topic_type_uri:  "dm4.poemspace.cc",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
+                },
+                {
+                    part_topic_type_uri:  "dm4.poemspace.bcc",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
+                },
+                {
+                    part_topic_type_uri:  "dm4.poemspace.subject",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
+                },
+                {
+                    part_topic_type_uri:  "dm4.poemspace.body",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
+                }
+            ],
+            label_config: [
+                dm4.poemspace.subject
+            ],
+            view_config_topics: [
+                {
+                    type_uri: "dm4.webclient.view_config",
+                    composite: {
+                        dm4.webclient.icon: "/com.poem-space.dm4-poemspace/images/envelope.png",
+                        dm4.webclient.add_to_create_menu: true,
+                        dm4.webclient.is_searchable_unit: true
+                    }
+                }
+            ]
+        }
+    ]
+}
