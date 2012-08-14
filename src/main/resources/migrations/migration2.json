@@ -1,0 +1,121 @@
+# criteria and mailing types
+{
+    topic_types: [
+        {
+            value: "Criteria Type",
+            uri: "dm4.poemspace.criteria.type",
+            data_type_uri: "dm4.core.text"
+        },
+        {
+            value: "Campaign Name",
+            uri: "dm4.poemspace.campaign.name",
+            data_type_uri: "dm4.core.text"
+        },
+        {
+            value: "Mail Campaign",
+            uri: "dm4.poemspace.campaign",
+            data_type_uri: "dm4.core.composite",
+            assoc_defs: [
+                {
+                    part_topic_type_uri:  "dm4.poemspace.campaign.name",
+                    part_cardinality_uri: "dm4.core.one",
+                    assoc_type_uri:       "dm4.core.composition_def"
+                },
+                {
+                    assoc_type_uri:        "dm4.core.aggregation_def",
+                    part_topic_type_uri:   "dm4.poemspace.bezirk",
+                    part_cardinality_uri:  "dm4.core.many",
+                    whole_cardinality_uri: "dm4.core.one"
+                },
+                {
+                    assoc_type_uri:        "dm4.core.aggregation_def",
+                    part_topic_type_uri:   "dm4.poemspace.kiez",
+                    part_cardinality_uri:  "dm4.core.many",
+                    whole_cardinality_uri: "dm4.core.one"
+                },
+                {
+                    assoc_type_uri:        "dm4.core.aggregation_def",
+                    part_topic_type_uri:   "dm4.poemspace.art",
+                    part_cardinality_uri:  "dm4.core.many",
+                    whole_cardinality_uri: "dm4.core.one"
+                },
+                {
+                    assoc_type_uri:        "dm4.core.aggregation_def",
+                    part_topic_type_uri:   "dm4.poemspace.gattung",
+                    part_cardinality_uri:  "dm4.core.many",
+                    whole_cardinality_uri: "dm4.core.one"
+                }
+            ],
+            label_config: [ "dm4.poemspace.campaign.name" ],
+            view_config_topics: [
+                {
+                    type_uri: "dm4.webclient.view_config",
+                    composite: {
+                        dm4.webclient.icon: "/com.poemspace.dm4-poemspace/images/mailing.png",
+                        dm4.webclient.page_renderer_uri: "dm4.poemspace.campaign.renderer",
+                        dm4.webclient.add_to_create_menu: true,
+                        dm4.webclient.is_searchable_unit: true
+                    }
+                }
+            ]
+        }
+    ],
+    assoc_types: [
+        {
+            value: "Additional Mailing Recipient",
+            uri: "dm4.poemspace.mailing.adds",
+            data_type_uri: "dm4.core.text"
+        },
+        {
+            value: "Excluded Mailing Recipient",
+            uri: "dm4.poemspace.mailing.excl",
+            data_type_uri: "dm4.core.text"
+        }
+    ],
+    associations: [
+        {
+            type_uri: "dm4.core.association",
+            role_1: {
+                topic_uri: "dm4.poemspace.criteria.type",
+                role_type_uri: "dm4.core.default"
+            },
+            role_2: {
+                topic_uri: "dm4.poemspace.bezirk",
+                role_type_uri: "dm4.core.default"
+            }
+        },
+        {
+            type_uri: "dm4.core.association",
+            role_1: {
+                topic_uri: "dm4.poemspace.criteria.type",
+                role_type_uri: "dm4.core.default"
+            },
+            role_2: {
+                topic_uri: "dm4.poemspace.kiez",
+                role_type_uri: "dm4.core.default"
+            }
+        },
+        {
+            type_uri: "dm4.core.association",
+            role_1: {
+                topic_uri: "dm4.poemspace.criteria.type",
+                role_type_uri: "dm4.core.default"
+            },
+            role_2: {
+                topic_uri: "dm4.poemspace.art",
+                role_type_uri: "dm4.core.default"
+            }
+        },
+        {
+            type_uri: "dm4.core.association",
+            role_1: {
+                topic_uri: "dm4.poemspace.criteria.type",
+                role_type_uri: "dm4.core.default"
+            },
+            role_2: {
+                topic_uri: "dm4.poemspace.gattung",
+                role_type_uri: "dm4.core.default"
+            }
+        }
+    ]
+}

@@ -1,0 +1,36 @@
+# test data
+{
+    topics: [
+        {
+            type_uri: "dm4.contacts.institution",
+            composite: {
+                dm4.poemspace.art: [ "Laden" ],
+                dm4.poemspace.bezirk: [ "Wedding" ],
+                dm4.poemspace.gattung: [ "Poesie" ],
+                dm4.poemspace.kiez: [ "Soldinerkiez" ],
+                dm4.contacts.email_address: [ "wortwedding@poem-space.com" ],
+                dm4.contacts.institution_name: "wortwedding - Laden für Poesieprojekte",
+                dm4.contacts.address_entry: [
+                    {
+                       dm4.contacts.street: "Prinzenallee 59",
+                       dm4.contacts.street: "13359",
+                       dm4.contacts.city: "Berlin"
+                    }
+                ]
+            }
+        },
+        {
+            type_uri: "dm4.contacts.person",
+            composite: {
+                dm4.poemspace.bezirk: [ "Treptow / Köpenick" ],
+                dm4.poemspace.gattung: [ "Bildende Kunst" ],
+                dm4.poemspace.kiez: [ "Altnickitown" ],
+                dm4.contacts.email_address: [ "github@dagnu.de" ],
+                dm4.contacts.person_name: {
+                    dm4.contacts.first_name: "Danny",
+                    dm4.contacts.last_name: "Gräf"
+                }
+            }
+        }
+    ]
+}

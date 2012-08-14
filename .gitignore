@@ -1,5 +1,6 @@
 runner/
 target/
-.project
 .classpath
+.idea
+.project
 .settings
