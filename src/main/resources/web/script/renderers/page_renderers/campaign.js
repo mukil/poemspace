@@ -6,27 +6,36 @@
  */
 (function ($, dm4c) {
 
-  function getCriteriaTypes() {
-    var criteriaType = dm4c.get_topic_type('dm4.poemspace.criteria.type')
-    return dm4c.restc.get_related_topics(criteriaType.id, {
-      assoc_type_uri: 'dm4.core.association'
-    }, null, null).items
+  // create criterion aggregation
+  function addCriterion(campaignId, criterionId) {
+    dm4c.restc.create_association({
+      type_uri: 'dm4.core.aggregation',
+      role_1: { topic_id: campaignId, role_type_uri: 'dm4.core.whole' },
+      role_2: { topic_id: criterionId, role_type_uri: 'dm4.core.part' }
+    })
   }
 
+  // get and delete criterion aggregation
+  function deleteCriterion(campaignId, criterionId) {
+    var aggregate = dm4c.restc.get_association('dm4.core.aggregation',
+      campaignId, criterionId, 'dm4.core.whole', 'dm4.core.part')
+    dm4c.restc.delete_association(aggregate.id)
+  }
+
+  // get all criterion instances of a criteria
   function getCriterionList(criteria) {
     return dm4c.restc.get_related_topics(criteria.id, {
       assoc_type_uri: 'dm4.core.instantiation',
-      //my_role_type_uri: 'dm4.core.type',
       others_role_type_uri: 'dm4.core.instance'
     }, null, null).items
   }
 
-  function createCriteriaFieldset(criteria, criterionList, aggregates) {
+  function createCriteriaFieldset(criteria, aggregates) {
     var $criterionById = {},
       $legend = $('<legend>').append(criteria.value),
       $criteria = $('<ul>').addClass('criteria')
 
-    $.each(criterionList, function (c, criterion) {
+    $.each(getCriterionList(criteria), function (c, criterion) {
       var cId = 'c' + criterion.id,
         $label = $('<label>').append(criterion.value).attr('for', cId),
         $input = $('<input>').attr({
@@ -47,30 +56,21 @@
     return $('<fieldset>').append($legend).append($criteria)
   }
 
-  function refreshRecipients(mailing, $recipents) {
-    var recipients = []
-    dm4c.restc.get_related_topics(mailing.id, {
-      assoc_type_uri: 'dm4.core.aggregation',
-      others_role_type_uri: 'dm4.core.part'
-    }, null, null).items
+  function refreshRecipients(campaign, $recipents) {
+    var recipients = dm4c.get_plugin('dm4.poemspace.plugin').getCampaignRecipients(campaign.id)
+    $recipents.empty().append(dm4c.render.topic_list(recipients))
   }
 
-  function registerCriterionChange(mailing, $parent, $recipients) {
+  function registerCriterionChange(campaign, $parent, $recipients) {
     $parent.on('change', 'input[type="checkbox"]', function () {
       var $input = $(this),
         criterion = $input.data('criterion')
       if ($input.attr('checked')) {
-        dm4c.restc.create_association({
-          type_uri: 'dm4.core.aggregation',
-          role_1: { topic_id: mailing.id, role_type_uri: 'dm4.core.whole' },
-          role_2: { topic_id: criterion.id, role_type_uri: 'dm4.core.part' }
-        })
+        addCriterion(campaign.id, criterion.id)
       } else {
-        var aggregate = dm4c.restc.get_association('dm4.core.aggregation',
-          mailing.id, criterion.id, 'dm4.core.whole', 'dm4.core.part')
-        dm4c.restc.delete_association(aggregate.id)
+        deleteCriterion(campaign.id, criterion.id)
       }
-      refreshRecipients(mailing, $recipients)
+      refreshRecipients(campaign, $recipients)
     })
   }
 
@@ -86,13 +86,12 @@
   /**
    * render a fieldset for each criteria and activate any aggregated criterion
    */
-  function createCriteriaFieldsetList(mailing) {
+  function createCriteriaFieldsetList(campaign) {
     var $fieldList = $('<div>'),
-      types = getCriteriaTypes()
+      types = dm4c.get_plugin('dm4.poemspace.plugin').getCriteriaTypes()
     $.each(types, function (t, type) {
-      var aggregates = getAggregates(mailing, type),
-        criterionList = getCriterionList(type),
-        $criteria = createCriteriaFieldset(type, criterionList, aggregates)
+      var aggregates = getAggregates(campaign, type),
+        $criteria = createCriteriaFieldset(type, aggregates)
       $fieldList.append($criteria)
     })
     return $fieldList
@@ -107,10 +106,10 @@
       dm4c.render.associations(topic.id)
     },
 
-    render_form: function (mailing) {
-      var $left = $('<div>').attr('style', 'float: left'),
-        $right = $('<div>').attr('style', 'float: right'),
-        $criteria = createCriteriaFieldsetList(mailing),
+    render_form: function (campaign) {
+      var $left = $('<div>').css({ float: 'left', width: '49%' }),
+        $right = $('<div>').css({ float: 'right', width: '49%' }),
+        $criteria = createCriteriaFieldsetList(campaign),
         $recipients = $('<div>')
 
       dm4c.render.field_label('Template', $left)
@@ -122,11 +121,11 @@
       dm4c.render.page($right)
       $right.append($recipients)
 
-      refreshRecipients(mailing, $recipients)
-      registerCriterionChange(mailing, $criteria, $recipients)
+      refreshRecipients(campaign, $recipients)
+      registerCriterionChange(campaign, $criteria, $recipients)
 
       return function () {
-        // nothing to do? dm4c.do_update_topic(mailing)
+        // nothing to do? dm4c.do_update_topic(campaign)
         dm4c.page_panel.refresh()
       }
     }

@@ -2,8 +2,12 @@
 
 dm4c.add_plugin('dm4.poemspace.plugin', function () {
 
-  dm4c.restc.get_criteria_types = function () {
-    return this.request('GET', '/poemspace/criteria-types')
+  this.getCriteriaTypes = function () {
+    return dm4c.restc.request('GET', '/poemspace/criteria-types').items
+  }
+
+  this.getCampaignRecipients = function (campaignId) {
+    return dm4c.restc.request('GET', '/poemspace/campaign/recipients/' + campaignId).items
   }
 
   dm4c.add_listener('post_refresh_create_menu', function (menu) {
