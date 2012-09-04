@@ -24,16 +24,34 @@
 
   // get all criterion instances of a criteria
   function getCriterionList(criteria) {
-    return dm4c.restc.get_related_topics(criteria.id, {
+    return dm4c.restc.get_topic_related_topics(criteria.id, {
       assoc_type_uri: 'dm4.core.instantiation',
       others_role_type_uri: 'dm4.core.instance'
     }, null, null).items
   }
 
+  function getRecipientsById(campaignId, type) {
+    return dm4c.restc.get_topic_related_topics(campaignId, {
+      assoc_type_uri: type
+    }, null, null).items
+  }
+
+  function includeRecipient(campaignId, recipientId) {
+    var uri = '/poemspace/campaign/' + campaignId + '/include/' + recipientId
+    return dm4c.restc.request('POST', uri).items
+  }
+
+  function excludeRecipient(campaignId, recipientId) {
+    var uri = '/poemspace/campaign/' + campaignId + '/exclude/' + recipientId
+    return dm4c.restc.request('POST', uri).items
+  }
+
   function createCriteriaFieldset(criteria, aggregates) {
     var $criterionById = {},
-      $legend = $('<legend>').append(criteria.value),
-      $criteria = $('<ul>').addClass('criteria')
+      $icon = dm4c.render.type_icon(criteria.uri).addClass('menu-icon'),
+      $legend = $('<legend>').append($icon).append(criteria.value),
+      $criteria = $('<ul>').addClass('criteria').hide(),
+      $fieldset = $('<fieldset>').append($legend).append($criteria)
 
     $.each(getCriterionList(criteria), function (c, criterion) {
       var cId = 'c' + criterion.id,
@@ -53,12 +71,90 @@
       $criterionById[aggregate.id].attr('checked', true)
     })
 
-    return $('<fieldset>').append($legend).append($criteria)
+    return $fieldset
   }
 
-  function refreshRecipients(campaign, $recipents) {
-    var recipients = dm4c.get_plugin('dm4.poemspace.plugin').getCampaignRecipients(campaign.id)
-    $recipents.empty().append(dm4c.render.topic_list(recipients))
+  // remove all recipient includes and refresh the list
+  function onRemoveInclude() {
+    var $recipient = $(this).parent().parent(),
+      recipientId = $recipient.data('recipient').id,
+      campaignId = dm4c.selected_object.id,
+      includes = dm4c.restc.get_associations(campaignId, recipientId, 'dm4.poemspace.campaign.adds')
+    $.each(includes, function (i, include) {
+      dm4c.do_delete_association(include)
+    })
+    refreshRecipients()
+  }
+
+  function onExclude() {
+    var $recipient = $(this).parent().parent(),
+      recipient = $recipient.data('recipient'),
+      campaignId = dm4c.selected_object.id
+    excludeRecipient(campaignId, recipient.id)
+    refreshRecipients()
+  }
+
+  function onRemoveExclude() {
+    var $recipient = $(this).parent().parent(),
+      recipientId = $recipient.data('recipient').id,
+      campaignId = dm4c.selected_object.id,
+      excludes = dm4c.restc.get_associations(campaignId, recipientId, 'dm4.poemspace.campaign.excl')
+    $.each(excludes, function (i, exclude) {
+      dm4c.do_delete_association(exclude)
+    })
+    refreshRecipients()
+  }
+
+  function createRecipient(recipient, type) {
+    function click() {
+      dm4c.do_reveal_related_topic(recipient.id)
+    }
+
+    var $icon = dm4c.render.icon_link(recipient, click),
+      $topic = dm4c.render.topic_link(recipient, click),
+      $topicDiv = $('<div>').addClass(type).append($icon).append($topic),
+      $removeDiv = $('<div>').addClass('remove-button'),
+      $recipient = $('<div>').append($topicDiv).append($removeDiv)
+    if (type === 'exclude') {
+      $removeDiv.append(dm4c.ui.button(onRemoveExclude, undefined, 'circle-plus'))
+    } else if (type === 'include') {
+      $removeDiv.append(dm4c.ui.button(onRemoveInclude, undefined, 'circle-minus'))
+    } else { // result
+      $removeDiv.append(dm4c.ui.button(onExclude, undefined, 'circle-minus'))
+    }
+    return $recipient.addClass('box').data('recipient', recipient)
+  }
+
+  // TODO move to js_utils
+  function mapById(topics) {
+    var topicsById = {}
+    $.each(topics, function (r, topic) {
+      topicsById[topic.id] = topic
+    })
+    return topicsById
+  }
+
+  function refreshRecipients() {
+    var campaignId = dm4c.selected_object.id,
+      recipients = dm4c.get_plugin('dm4.poemspace.plugin').getCampaignRecipients(campaignId),
+      $recipients = $('#campaign' + campaignId + 'recipients').empty(),
+      excludes = getRecipientsById(campaignId, 'dm4.poemspace.campaign.excl'),
+      includesById = mapById(getRecipientsById(campaignId, 'dm4.poemspace.campaign.adds')),
+      excludesById = mapById(excludes)
+
+    $.merge(recipients, excludes).sort(function (a, b) {
+      return (a.value < b.value) ? -1 : (a.value > b.value) ? 1 : 0;
+    })
+
+    $.each(recipients, function (r, recipient) {
+      if (excludesById[recipient.id]) {
+        $recipients.append(createRecipient(recipient, 'exclude'))
+      } else if (includesById[recipient.id]) {
+        $recipients.append(createRecipient(recipient, 'include'))
+      } else {
+        $recipients.append(createRecipient(recipient, 'result'))
+      }
+    })
   }
 
   function registerCriterionChange(campaign, $parent, $recipients) {
@@ -70,7 +166,7 @@
       } else {
         deleteCriterion(campaign.id, criterion.id)
       }
-      refreshRecipients(campaign, $recipients)
+      refreshRecipients()
     })
   }
 
@@ -99,35 +195,69 @@
 
   dm4c.add_page_renderer('dm4.poemspace.campaign.renderer', {
 
-    render_page: function (topic) {
-      dm4c.render.field_label('Template')
-      dm4c.render.page('Monthly Meeting')
-      //
-      dm4c.render.associations(topic.id)
+    render_page: function (campaign) {
+      var subject = campaign.composite['dm4.mail.subject'],
+        template = campaign.composite['dm4.poemspace.template']
+      if ($.isPlainObject(subject)) {
+        dm4c.render.page($('<h1>').append(subject.value))
+      }
+      if ($.isPlainObject(template)) {
+        dm4c.render.field_label('Template')
+        function clickTemplate() {
+          dm4c.do_reveal_related_topic(template.id)
+        }
+
+        dm4c.render.page(dm4c.render.icon_link(template, clickTemplate))
+        dm4c.render.page(dm4c.render.topic_link(template, clickTemplate))
+      }
+      dm4c.render.topic_associations(campaign.id)
     },
 
     render_form: function (campaign) {
       var $left = $('<div>').css({ float: 'left', width: '49%' }),
         $right = $('<div>').css({ float: 'right', width: '49%' }),
+        subject = campaign.composite['dm4.mail.subject'],
+        template = campaign.composite['dm4.poemspace.template'] || { id: -1 },
+        $subject = dm4c.render.input(subject),
+        templateMenu = dm4c.render.topic_menu('dm4.poemspace.template', template.id),
         $criteria = createCriteriaFieldsetList(campaign),
-        $recipients = $('<div>')
+        $recipients = $('<div>').attr('id', 'campaign' + campaign.id + 'recipients')
+
+      dm4c.render.field_label('Subject', $left)
+      $left.append($subject)
 
       dm4c.render.field_label('Template', $left)
+      $left.append(templateMenu.dom)
+
       dm4c.render.field_label('Criteria', $left)
-      dm4c.render.page($left)
       $left.append($criteria)
+      dm4c.render.page($left)
+      $criteria.on('click', 'legend', function () {
+        $('ul', $(this).parent()).toggle()
+      })
 
       dm4c.render.field_label('Recipients', $right)
       dm4c.render.page($right)
-      $right.append($recipients)
+      $right.append($recipients).append(dm4c.get_plugin('dm4.mail.plugin')
+        .createCompletionField('Add', function include($item, item) {
+          includeRecipient(campaign.id, item.id)
+          refreshRecipients()
+        }))
 
-      refreshRecipients(campaign, $recipients)
+      refreshRecipients()
       registerCriterionChange(campaign, $criteria, $recipients)
 
       return function () {
-        // nothing to do? dm4c.do_update_topic(campaign)
+        var selection = templateMenu.get_selection()
+        dm4c.do_update_topic({
+          id: campaign.id,
+          composite: {
+            'dm4.mail.subject': $.trim($subject.val()),
+            'dm4.poemspace.template': dm4c.REF_PREFIX + selection.value
+          }
+        })
         dm4c.page_panel.refresh()
       }
     }
   })
-})(jQuery, dm4c)
+}(jQuery, dm4c))

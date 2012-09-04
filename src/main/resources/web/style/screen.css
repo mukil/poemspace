@@ -3,3 +3,15 @@
   padding: 0;
   list-style: none;
 }
+
+.exclude {
+  background-color: #F2DEDE;
+}
+
+.include {
+  background-color: #DFF0D8;
+}
+
+.result {
+  background-color: #D9EDF7;
+}

@@ -1,6 +1,7 @@
 package com.poemspace.dm4;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -23,9 +24,9 @@ public class CriteriaCache {
     }
 
     /**
-     * get all criteria types
+     * Returns all criteria types.
      * 
-     * @return a list of all criteria type associated type topics
+     * @return list of all criteria associated type topics
      */
     public List<Topic> getTypes() {
         if (types == null) {
@@ -36,14 +37,15 @@ public class CriteriaCache {
                     null, null, false, false, 0, null)) {
                 types.add(type);
             }
+            Collections.sort(types, PoemSpacePlugin.VALUE_COMPARATOR);
         }
         return types;
     }
 
     /**
-     * get all criteria type URIs
+     * Returns all criteria type URIs.
      * 
-     * @return a list of all criteria type associated type topic URIs
+     * @return list of all criteria associated type topic URIs
      */
     public List<String> getTypeUris() {
         if (typeUris == null) {
