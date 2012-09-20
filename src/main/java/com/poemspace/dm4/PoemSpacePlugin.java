@@ -1,6 +1,7 @@
 package com.poemspace.dm4;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -21,13 +22,18 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.DeepaMehtaTransaction;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
+import de.deepamehta.core.TopicType;
+import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.CompositeValue;
+import de.deepamehta.core.model.IndexMode;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
+import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.DeepaMehtaService;
@@ -68,6 +74,42 @@ public class PoemSpacePlugin extends PluginActivator implements //
         } catch (Exception e) {
             throw new WebApplicationException(e);
         }
+    }
+
+    @POST
+    @Path("/criteria/{name}")
+    public Topic createCriteria(@PathParam("name") String name,
+            @HeaderParam("Cookie") ClientState cookie) {
+        log.info("create criteria " + name);
+        // TODO sanitize name parameter
+        String uri = "dm4.poemspace.criteria." + name.trim().toLowerCase();
+
+        try {
+            TopicType type = dms.createTopicType(//
+                    new TopicTypeModel(uri, name, "dm4.core.text"), cookie);
+            type.setIndexModes(new HashSet<IndexMode>(Arrays.asList(IndexMode.FULLTEXT)));
+
+            // TODO set parameters in one call without explicit transaction?
+            DeepaMehtaTransaction tx = dms.beginTx();
+            ViewConfiguration viewConfig = type.getViewConfig();
+            viewConfig.addSetting("dm4.webclient.view_config",//
+                    "dm4.webclient.multi_renderer_uri", "dm4.webclient.checkbox_renderer");
+            viewConfig.addSetting("dm4.webclient.view_config",//
+                    "dm4.webclient.add_to_create_menu", true);
+            viewConfig.addSetting("dm4.webclient.view_config",//
+                    "dm4.webclient.is_searchable_unit", true);
+            tx.success();
+            tx.finish();
+
+            // associate criteria type
+            dms.createAssociation(new AssociationModel("dm4.core.association",//
+                    new TopicRoleModel("dm4.poemspace.criteria.type", "dm4.core.default"),//
+                    new TopicRoleModel(type.getId(), "dm4.core.default"), null), cookie);
+            return type;
+        } catch (Exception e) {
+            throw new WebApplicationException(e);
+        }
+
     }
 
     @POST
@@ -280,9 +322,11 @@ public class PoemSpacePlugin extends PluginActivator implements //
             throw new IllegalStateException("only one association is supported");
         }
         for (Association association : associations) {
+            log.fine("update recipient " + typeUri + " association");
             association.setTypeUri(typeUri);
             return association; // only one association can be used
         }
+        log.fine("create recipient " + typeUri + " association");
         return dms.createAssociation(new AssociationModel(typeUri,//
                 new TopicRoleModel(campaignId, "dm4.core.default"),//
                 new TopicRoleModel(recipientId, "dm4.core.default"), null), clientState);

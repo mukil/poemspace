@@ -16,13 +16,25 @@ dm4c.add_plugin('dm4.poemspace.plugin', function () {
     dm4c.do_reveal_related_topic(dm4c.restc.request('POST', uri).id)
   }
 
+  function createCriteria() {
+    dm4c.ui.prompt('New Criteria', 'Name', 'Add', function (name) {
+      var uri = '/poemspace/criteria/' + name,
+        criteria = dm4c.restc.request('POST', uri)
+      // FIXME update client type cache without another server interaction
+      dm4c.do_update_topic_type(criteria)
+      // FIXME assign topicmap before?
+      dm4c.do_show_topic(criteria.id)
+    })
+  }
+
   // configure menu and type commands
   dm4c.add_listener('topic_commands', function (topic) {
     if (!dm4c.has_create_permission('dm4.poemspace.campaign')) {
       return
     }
-    var commands = [];
+    var commands = []
     if (topic.type_uri === 'dm4.poemspace.campaign') {
+      commands.push({is_separator: true, context: 'context-menu'})
       commands.push({
         label: 'Write Mail',
         handler: writeMail,
@@ -37,16 +49,7 @@ dm4c.add_plugin('dm4.poemspace.plugin', function () {
       return
     }
     menu.add_separator()
-    menu.add_item({
-      label: 'New Criteria',
-      handler: function () {
-        alert('create a new criteria')
-        // TODO call server method to:
-        //  * create topic type
-        //  * associate with criteria singleton
-        //  * add association definition to person and institution
-      }
-    })
+    menu.add_item({ label: 'New Criteria', handler: createCriteria })
   })
 
 })

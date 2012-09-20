@@ -143,7 +143,7 @@
       excludesById = mapById(excludes)
 
     $.merge(recipients, excludes).sort(function (a, b) {
-      return (a.value < b.value) ? -1 : (a.value > b.value) ? 1 : 0;
+      return (a.value < b.value) ? -1 : (a.value > b.value) ? 1 : 0
     })
 
     $.each(recipients, function (r, recipient) {

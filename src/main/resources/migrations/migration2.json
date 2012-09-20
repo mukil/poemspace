@@ -10,7 +10,6 @@
                     type_uri: "dm4.webclient.view_config",
                     composite: {
                         dm4.webclient.icon: "/com.poemspace.dm4-poemspace/images/criteria.png",
-                        dm4.webclient.add_to_create_menu: true
                     }
                 }
             ]
