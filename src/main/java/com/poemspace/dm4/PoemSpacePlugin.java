@@ -165,21 +165,29 @@ public class PoemSpacePlugin extends PluginActivator implements //
         log.info("create a campaign " + campaignId + " mail");
         try {
             Topic campaign = dms.getTopic(campaignId, true, cookie);
+            RelatedTopic template = campaign.getRelatedTopic("dm4.core.aggregation", //
+                    "dm4.core.whole", "dm4.core.part",//
+                    "dm4.poemspace.template", true, false, cookie);
+
             String subject = campaign.getCompositeValue().getString("dm4.mail.subject");
-            TopicModel template = campaign.getCompositeValue().getTopic("dm4.poemspace.template");
             String body = template.getCompositeValue().getString("dm4.mail.body");
+            RelatedTopic sender = template.getRelatedTopic("dm4.mail.sender",//
+                    "dm4.core.whole", "dm4.core.part", null, true, false, cookie);
 
-            TopicModel model = new TopicModel("dm4.mail", new CompositeValue()//
+            Topic mail = dms.createTopic(new TopicModel("dm4.mail", new CompositeValue()//
+                    .put("dm4.mail.from", true)// do not use the default sender
                     .put("dm4.mail.subject", subject)//
-                    .put("dm4.mail.body", body));
+                    .put("dm4.mail.body", body)), cookie);
 
-            Topic mail = dms.createTopic(model, cookie);
-            createOrUpdateRecipient("dm4.core.association", campaignId, mail.getId(), cookie);
-
+            mailService.associateSender(mail.getId(), sender, cookie);
             for (Topic recipient : queryCampaignRecipients(campaign)) {
                 mailService.associateRecipient(mail.getId(),
                         dms.getTopic(recipient.getId(), true, cookie), RecipientType.BCC, cookie);
             }
+            dms.createAssociation(new AssociationModel("dm4.core.association",//
+                    new TopicRoleModel(campaignId, "dm4.core.default"),//
+                    new TopicRoleModel(mail.getId(), "dm4.core.default"), null), cookie);
+
             return mail;
         } catch (Exception e) {
             throw new WebApplicationException(new RuntimeException(//

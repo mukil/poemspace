@@ -11,9 +11,16 @@ dm4c.add_plugin('dm4.poemspace.plugin', function () {
     return dm4c.restc.request('GET', uri)
   }
 
+  function saveAndWriteMail() {
+    dm4c.page_panel.save()
+    writeMail()
+  }
+
   function writeMail() {
-    var uri = '/poemspace/campaign/' + dm4c.selected_object.id + '/write'
-    dm4c.do_reveal_related_topic(dm4c.restc.request('POST', uri).id)
+    var uri = '/poemspace/campaign/' + dm4c.selected_object.id + '/write',
+      mail = dm4c.restc.request('POST', uri)
+    dm4c.do_reveal_related_topic(mail.id)
+    dm4c.show_topic(new Topic(mail), 'edit')
   }
 
   function createCriteria() {
@@ -23,8 +30,22 @@ dm4c.add_plugin('dm4.poemspace.plugin', function () {
       // FIXME update client type cache without another server interaction
       dm4c.do_update_topic_type(criteria)
       // FIXME assign topicmap before?
-      dm4c.do_show_topic(criteria.id)
+      dm4c.do_select_topic(criteria.id)
     })
+  }
+
+  function isCampaignMail(mailId) {
+    var campaigns = dm4c.restc.get_topic_related_topics(mailId, {
+      assoc_type_uri: 'dm4.core.association',
+      others_topic_type_uri: 'dm4.poemspace.campaign'
+    }, null, null)
+    return campaigns.total_count === 1 ? true : false
+  }
+
+  function mailRecipientCheck(mail) {
+    if (isCampaignMail(mail.id)) {
+      return $('<span>').text('Campaign recipient list...')
+    }
   }
 
   // configure menu and type commands
@@ -40,6 +61,11 @@ dm4c.add_plugin('dm4.poemspace.plugin', function () {
         handler: writeMail,
         context: ['context-menu', 'detail-panel-show']
       })
+      commands.push({
+        label: 'Write Mail',
+        handler: saveAndWriteMail,
+        context: ['detail-panel-edit']
+      })
     }
     return commands
   })
@@ -51,5 +77,9 @@ dm4c.add_plugin('dm4.poemspace.plugin', function () {
     menu.add_separator()
     menu.add_item({ label: 'New Criteria', handler: createCriteria })
   })
+
+  // TODO display count or some other additional information
+  dm4c.add_listener('render_mail_recipients_info', mailRecipientCheck)
+  dm4c.add_listener('render_mail_recipients_form', mailRecipientCheck)
 
 })
