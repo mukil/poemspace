@@ -6,6 +6,7 @@
 
 .exclude {
   background-color: #F2DEDE;
+  text-decoration: line-through;
 }
 
 .include {

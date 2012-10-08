@@ -28,6 +28,7 @@ import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
 import de.deepamehta.core.ViewConfiguration;
+import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.IndexMode;
@@ -36,8 +37,8 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
-import de.deepamehta.core.service.DeepaMehtaService;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.event.InitializePluginListener;
 import de.deepamehta.core.service.event.PluginServiceArrivedListener;
 import de.deepamehta.core.service.event.PluginServiceGoneListener;
 import de.deepamehta.plugins.mail.RecipientType;
@@ -46,6 +47,7 @@ import de.deepamehta.plugins.mail.service.MailService;
 @Path("/poemspace")
 @Produces(MediaType.APPLICATION_JSON)
 public class PoemSpacePlugin extends PluginActivator implements //
+        InitializePluginListener,//
         PluginServiceArrivedListener,//
         PluginServiceGoneListener {
 
@@ -84,13 +86,13 @@ public class PoemSpacePlugin extends PluginActivator implements //
         // TODO sanitize name parameter
         String uri = "dm4.poemspace.criteria." + name.trim().toLowerCase();
 
+        TopicType type = null;
+        DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            TopicType type = dms.createTopicType(//
+            type = dms.createTopicType(//
                     new TopicTypeModel(uri, name, "dm4.core.text"), cookie);
             type.setIndexModes(new HashSet<IndexMode>(Arrays.asList(IndexMode.FULLTEXT)));
 
-            // TODO set parameters in one call without explicit transaction?
-            DeepaMehtaTransaction tx = dms.beginTx();
             ViewConfiguration viewConfig = type.getViewConfig();
             viewConfig.addSetting("dm4.webclient.view_config",//
                     "dm4.webclient.multi_renderer_uri", "dm4.webclient.checkbox_renderer");
@@ -98,18 +100,29 @@ public class PoemSpacePlugin extends PluginActivator implements //
                     "dm4.webclient.add_to_create_menu", true);
             viewConfig.addSetting("dm4.webclient.view_config",//
                     "dm4.webclient.is_searchable_unit", true);
-            tx.success();
-            tx.finish();
 
             // associate criteria type
             dms.createAssociation(new AssociationModel("dm4.core.association",//
                     new TopicRoleModel("dm4.poemspace.criteria.type", "dm4.core.default"),//
                     new TopicRoleModel(type.getId(), "dm4.core.default"), null), cookie);
-            return type;
+
+            // create search type aggregates
+            for (Topic topic : mailService.getSearchParentTypes()) {
+                TopicType searchType = dms.getTopicType(topic.getUri(), cookie);
+                searchType.addAssocDef(new AssociationDefinitionModel("dm4.core.aggregation_def",
+                        searchType.getUri(), type.getUri(), "dm4.core.one", "dm4.core.many"));
+            }
+
+            // renew cache
+            criteria = new CriteriaCache(dms);
+            tx.success();
         } catch (Exception e) {
             throw new WebApplicationException(e);
+        } finally {
+            tx.finish();
         }
 
+        return type;
     }
 
     @POST
@@ -163,6 +176,7 @@ public class PoemSpacePlugin extends PluginActivator implements //
             @PathParam("id") long campaignId,//
             @HeaderParam("Cookie") ClientState cookie) {
         log.info("create a campaign " + campaignId + " mail");
+        DeepaMehtaTransaction tx = dms.beginTx();
         try {
             Topic campaign = dms.getTopic(campaignId, true, cookie);
             RelatedTopic template = campaign.getRelatedTopic("dm4.core.aggregation", //
@@ -187,11 +201,13 @@ public class PoemSpacePlugin extends PluginActivator implements //
             dms.createAssociation(new AssociationModel("dm4.core.association",//
                     new TopicRoleModel(campaignId, "dm4.core.default"),//
                     new TopicRoleModel(mail.getId(), "dm4.core.default"), null), cookie);
-
+            tx.success();
             return mail;
         } catch (Exception e) {
             throw new WebApplicationException(new RuntimeException(//
                     "write a mail from campaign \"" + campaignId + "\" failed", e));
+        } finally {
+            tx.finish();
         }
     }
 
@@ -199,10 +215,8 @@ public class PoemSpacePlugin extends PluginActivator implements //
      * Initialize criteria cache.
      */
     @Override
-    public void setCoreService(DeepaMehtaService dms) {
-        super.setCoreService(dms);
+    public void initializePlugin() {
         // TODO add update listener to reload cache (create, update, delete)
-        log.info("core service reference change");
         criteria = new CriteriaCache(dms);
     }
 
@@ -339,4 +353,5 @@ public class PoemSpacePlugin extends PluginActivator implements //
                 new TopicRoleModel(campaignId, "dm4.core.default"),//
                 new TopicRoleModel(recipientId, "dm4.core.default"), null), clientState);
     }
+
 }

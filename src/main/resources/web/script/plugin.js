@@ -3,11 +3,11 @@
 dm4c.add_plugin('dm4.poemspace.plugin', function () {
 
   this.getCriteriaTypes = function () {
-    return dm4c.restc.request('GET', '/poemspace/criteria-types')
+    return dm4c.restc.request('GET', 'poemspace/criteria-types')
   }
 
   this.getCampaignRecipients = function (campaignId) {
-    var uri = '/poemspace/campaign/' + campaignId + '/recipients'
+    var uri = 'poemspace/campaign/' + campaignId + '/recipients'
     return dm4c.restc.request('GET', uri)
   }
 
@@ -17,7 +17,7 @@ dm4c.add_plugin('dm4.poemspace.plugin', function () {
   }
 
   function writeMail() {
-    var uri = '/poemspace/campaign/' + dm4c.selected_object.id + '/write',
+    var uri = 'poemspace/campaign/' + dm4c.selected_object.id + '/write',
       mail = dm4c.restc.request('POST', uri)
     dm4c.do_reveal_related_topic(mail.id)
     dm4c.show_topic(new Topic(mail), 'edit')
@@ -25,12 +25,11 @@ dm4c.add_plugin('dm4.poemspace.plugin', function () {
 
   function createCriteria() {
     dm4c.ui.prompt('New Criteria', 'Name', 'Add', function (name) {
-      var uri = '/poemspace/criteria/' + name,
+      var uri = 'poemspace/criteria/' + name,
         criteria = dm4c.restc.request('POST', uri)
       // FIXME update client type cache without another server interaction
       dm4c.do_update_topic_type(criteria)
-      // FIXME assign topicmap before?
-      dm4c.do_select_topic(criteria.id)
+      dm4c.show_topic(new Topic(criteria), 'edit')
     })
   }
 
@@ -44,6 +43,7 @@ dm4c.add_plugin('dm4.poemspace.plugin', function () {
 
   function mailRecipientCheck(mail) {
     if (isCampaignMail(mail.id)) {
+      // TODO save count after each query and display it
       return $('<span>').text('Campaign recipient list...')
     }
   }

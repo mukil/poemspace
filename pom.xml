@@ -13,16 +13,23 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
 
     <parent>
         <groupId>de.deepamehta</groupId>
-        <artifactId>deepamehta-parent</artifactId>
-        <version>3</version>
-        <relativePath>../deepamehta-parent/pom.xml</relativePath>
+        <artifactId>deepamehta-plugin-parent</artifactId>
+        <version>4.0.13-SNAPSHOT</version>
     </parent>
 
+    <properties>
+        <dm4.filerepo.path>/home/dagnu/Documents/projects/dm4/deepamehta/deepamehta-files</dm4.filerepo.path>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-webservice</artifactId>
-            <version>4.0.12-SNAPSHOT</version>
+            <version>4.0.13-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>de.deepamehta</groupId>
+            <artifactId>deepamehta-images</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>

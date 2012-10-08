@@ -37,21 +37,23 @@
   }
 
   function includeRecipient(campaignId, recipientId) {
-    var uri = '/poemspace/campaign/' + campaignId + '/include/' + recipientId
+    var uri = 'poemspace/campaign/' + campaignId + '/include/' + recipientId
     return dm4c.restc.request('POST', uri).items
   }
 
   function excludeRecipient(campaignId, recipientId) {
-    var uri = '/poemspace/campaign/' + campaignId + '/exclude/' + recipientId
+    var uri = 'poemspace/campaign/' + campaignId + '/exclude/' + recipientId
     return dm4c.restc.request('POST', uri).items
   }
 
   function createCriteriaFieldset(criteria, aggregates) {
     var $criterionById = {},
       $icon = dm4c.render.type_icon(criteria.uri).addClass('menu-icon'),
-      $legend = $('<legend>').append($icon).append(criteria.value),
+      $closed = $('<span>').addClass('ui-icon ui-icon-circle-triangle-s').css('float', 'right'),
+      $open = $('<span>').addClass('ui-icon ui-icon-circle-triangle-n').css('float', 'right').hide(),
+      $legend = $('<p>').addClass('ui-state-default').append($icon).append(criteria.value).append($closed).append($open),
       $criteria = $('<ul>').addClass('criteria').hide(),
-      $fieldset = $('<fieldset>').append($legend).append($criteria)
+      $fieldset = $('<div>').addClass('box level1').append($legend).append($criteria)
 
     $.each(getCriterionList(criteria), function (c, criterion) {
       var cId = 'c' + criterion.id,
@@ -74,7 +76,7 @@
     return $fieldset
   }
 
-  // remove all recipient includes and refresh the list
+  // remove recipient include, create an exclude and refresh the list
   function onRemoveInclude() {
     var $recipient = $(this).parent().parent(),
       recipientId = $recipient.data('recipient').id,
@@ -83,14 +85,15 @@
     $.each(includes, function (i, include) {
       dm4c.do_delete_association(include)
     })
+    excludeRecipient(campaignId, recipientId)
     refreshRecipients()
   }
 
   function onExclude() {
     var $recipient = $(this).parent().parent(),
-      recipient = $recipient.data('recipient'),
+      recipientId = $recipient.data('recipient').id,
       campaignId = dm4c.selected_object.id
-    excludeRecipient(campaignId, recipient.id)
+    excludeRecipient(campaignId, recipientId)
     refreshRecipients()
   }
 
@@ -145,7 +148,7 @@
     $.merge(recipients, excludes).sort(function (a, b) {
       return (a.value < b.value) ? -1 : (a.value > b.value) ? 1 : 0
     })
-
+    $recipients.prev().text(recipients.length + ' Recipients')
     $.each(recipients, function (r, recipient) {
       if (excludesById[recipient.id]) {
         $recipients.append(createRecipient(recipient, 'exclude'))
@@ -232,8 +235,9 @@
       dm4c.render.field_label('Criteria', $left)
       $left.append($criteria)
       dm4c.render.page($left)
-      $criteria.on('click', 'legend', function () {
+      $criteria.on('click', 'p', function () {
         $('ul', $(this).parent()).toggle()
+        $('span', $(this)).toggle()
       })
 
       dm4c.render.field_label('Recipients', $right)
