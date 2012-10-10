@@ -145,10 +145,13 @@
       includesById = mapById(getRecipientsById(campaignId, 'dm4.poemspace.campaign.adds')),
       excludesById = mapById(excludes)
 
+    // render count before merge
+    $recipients.prev().text(recipients.length + ' Recipients')
+
     $.merge(recipients, excludes).sort(function (a, b) {
       return (a.value < b.value) ? -1 : (a.value > b.value) ? 1 : 0
     })
-    $recipients.prev().text(recipients.length + ' Recipients')
+
     $.each(recipients, function (r, recipient) {
       if (excludesById[recipient.id]) {
         $recipients.append(createRecipient(recipient, 'exclude'))
@@ -199,46 +202,33 @@
   dm4c.add_page_renderer('dm4.poemspace.campaign.renderer', {
 
     render_page: function (campaign) {
-      var subject = campaign.composite['dm4.mail.subject'],
-        template = campaign.composite['dm4.poemspace.template']
-      if ($.isPlainObject(subject)) {
-        dm4c.render.page($('<h1>').append(subject.value))
-      }
-      if ($.isPlainObject(template)) {
-        dm4c.render.field_label('Template')
-        function clickTemplate() {
-          dm4c.do_reveal_related_topic(template.id)
-        }
-
-        dm4c.render.page(dm4c.render.icon_link(template, clickTemplate))
-        dm4c.render.page(dm4c.render.topic_link(template, clickTemplate))
+      var subject = campaign.composite['dm4.mail.subject']
+      if (subject) {
+        dm4c.render.field_label('Name')
+        dm4c.render.page(subject.value)
       }
       dm4c.render.topic_associations(campaign.id)
     },
 
     render_form: function (campaign) {
-      var $left = $('<div>').css({ float: 'left', width: '49%' }),
+      var name = campaign.composite['dm4.mail.subject'],
+        $name = dm4c.render.input(name),
+        $left = $('<div>').css({ float: 'left', width: '49%' }),
         $right = $('<div>').css({ float: 'right', width: '49%' }),
-        subject = campaign.composite['dm4.mail.subject'],
-        template = campaign.composite['dm4.poemspace.template'] || { id: -1 },
-        $subject = dm4c.render.input(subject),
-        templateMenu = dm4c.render.topic_menu('dm4.poemspace.template', template.id),
         $criteria = createCriteriaFieldsetList(campaign),
         $recipients = $('<div>').attr('id', 'campaign' + campaign.id + 'recipients')
 
-      dm4c.render.field_label('Subject', $left)
-      $left.append($subject)
-
-      dm4c.render.field_label('Template', $left)
-      $left.append(templateMenu.dom)
-
-      dm4c.render.field_label('Criteria', $left)
-      $left.append($criteria)
-      dm4c.render.page($left)
       $criteria.on('click', 'p', function () {
         $('ul', $(this).parent()).toggle()
         $('span', $(this)).toggle()
       })
+
+      dm4c.render.field_label('Name', $left)
+      $left.append($name)
+      dm4c.render.field_label('Criteria', $left)
+      $left.append($criteria)
+
+      dm4c.render.page($left)
 
       dm4c.render.field_label('Recipients', $right)
       dm4c.render.page($right)
@@ -252,15 +242,13 @@
       registerCriterionChange(campaign, $criteria, $recipients)
 
       return function () {
-        var selection = templateMenu.get_selection()
         dm4c.do_update_topic({
           id: campaign.id,
           composite: {
-            'dm4.mail.subject': $.trim($subject.val()),
-            'dm4.poemspace.template': dm4c.REF_PREFIX + selection.value
+            'dm4.mail.subject': $.trim($name.val())
           }
         })
-        dm4c.page_panel.refresh()
+        //dm4c.page_panel.refresh()
       }
     }
   })

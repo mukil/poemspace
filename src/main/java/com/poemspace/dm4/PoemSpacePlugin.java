@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -30,8 +31,8 @@ import de.deepamehta.core.TopicType;
 import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
-import de.deepamehta.core.model.CompositeValue;
 import de.deepamehta.core.model.IndexMode;
+import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
@@ -41,6 +42,7 @@ import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.event.InitializePluginListener;
 import de.deepamehta.core.service.event.PluginServiceArrivedListener;
 import de.deepamehta.core.service.event.PluginServiceGoneListener;
+import de.deepamehta.plugins.mail.Mail;
 import de.deepamehta.plugins.mail.RecipientType;
 import de.deepamehta.plugins.mail.service.MailService;
 
@@ -50,6 +52,10 @@ public class PoemSpacePlugin extends PluginActivator implements //
         InitializePluginListener,//
         PluginServiceArrivedListener,//
         PluginServiceGoneListener {
+
+    private static final String CAMPAIGN = "dm4.poemspace.campaign";
+
+    private static final String COUNT = "dm4.poemspace.campaign.count";
 
     private static final String EXCLUDE = "dm4.poemspace.campaign.excl";
 
@@ -86,10 +92,9 @@ public class PoemSpacePlugin extends PluginActivator implements //
         // TODO sanitize name parameter
         String uri = "dm4.poemspace.criteria." + name.trim().toLowerCase();
 
-        TopicType type = null;
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            type = dms.createTopicType(//
+            TopicType type = dms.createTopicType(//
                     new TopicTypeModel(uri, name, "dm4.core.text"), cookie);
             type.setIndexModes(new HashSet<IndexMode>(Arrays.asList(IndexMode.FULLTEXT)));
 
@@ -116,13 +121,13 @@ public class PoemSpacePlugin extends PluginActivator implements //
             // renew cache
             criteria = new CriteriaCache(dms);
             tx.success();
+
+            return type;
         } catch (Exception e) {
             throw new WebApplicationException(e);
         } finally {
             tx.finish();
         }
-
-        return type;
     }
 
     @POST
@@ -159,53 +164,85 @@ public class PoemSpacePlugin extends PluginActivator implements //
             @PathParam("id") long campaignId,//
             @HeaderParam("Cookie") ClientState cookie) {
         log.info("get campaign " + campaignId + " recipients");
+        DeepaMehtaTransaction tx = dms.beginTx();
         try {
             Topic campaign = dms.getTopic(campaignId, true, cookie);
+
+            // get and sort recipients
             List<Topic> recipients = queryCampaignRecipients(campaign);
             Collections.sort(recipients, VALUE_COMPARATOR);
+
+            // update campaign count and return result
+            campaign.setChildTopicValue(COUNT, new SimpleValue(recipients.size()));
+            tx.success();
             return recipients;
         } catch (Exception e) {
             throw new WebApplicationException(new RuntimeException(//
                     "recipients query of campaign " + campaignId + " failed", e));
+        } finally {
+            tx.finish();
         }
     }
 
-    @POST
-    @Path("/campaign/{id}/write")
-    public Topic writeMail(//
-            @PathParam("id") long campaignId,//
+    /**
+     * Starts and returns a new campaign from a mail.
+     * 
+     * @param mailId
+     * @param cookie
+     * @return Campaign associated with the starting mail.
+     */
+    @PUT
+    @Path("/mail/{id}/start")
+    public Topic startCampaign(//
+            @PathParam("id") long mailId,//
             @HeaderParam("Cookie") ClientState cookie) {
-        log.info("create a campaign " + campaignId + " mail");
+        log.info("start a campaign from mail " + mailId);
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            Topic campaign = dms.getTopic(campaignId, true, cookie);
-            RelatedTopic template = campaign.getRelatedTopic("dm4.core.aggregation", //
-                    "dm4.core.whole", "dm4.core.part",//
-                    "dm4.poemspace.template", true, false, cookie);
-
-            String subject = campaign.getCompositeValue().getString("dm4.mail.subject");
-            String body = template.getCompositeValue().getString("dm4.mail.body");
-            RelatedTopic sender = template.getRelatedTopic("dm4.mail.sender",//
-                    "dm4.core.whole", "dm4.core.part", null, true, false, cookie);
-
-            Topic mail = dms.createTopic(new TopicModel("dm4.mail", new CompositeValue()//
-                    .put("dm4.mail.from", true)// do not use the default sender
-                    .put("dm4.mail.subject", subject)//
-                    .put("dm4.mail.body", body)), cookie);
-
-            mailService.associateSender(mail.getId(), sender, cookie);
-            for (Topic recipient : queryCampaignRecipients(campaign)) {
-                mailService.associateRecipient(mail.getId(),
-                        dms.getTopic(recipient.getId(), true, cookie), RecipientType.BCC, cookie);
-            }
+            Topic campaign = dms.createTopic(new TopicModel(CAMPAIGN), cookie);
             dms.createAssociation(new AssociationModel("dm4.core.association",//
-                    new TopicRoleModel(campaignId, "dm4.core.default"),//
-                    new TopicRoleModel(mail.getId(), "dm4.core.default"), null), cookie);
+                    new TopicRoleModel(mailId, "dm4.core.default"),//
+                    new TopicRoleModel(campaign.getId(), "dm4.core.default"), null), cookie);
             tx.success();
-            return mail;
+            return campaign;
         } catch (Exception e) {
             throw new WebApplicationException(new RuntimeException(//
-                    "write a mail from campaign \"" + campaignId + "\" failed", e));
+                    "start a campaign from mail \"" + mailId + "\" failed", e));
+        } finally {
+            tx.finish();
+        }
+    }
+
+    /**
+     * Sends a campaign mail.
+     * 
+     * @param mailId
+     * @param cookie
+     * @return Sent mail topic.
+     */
+    @PUT
+    @Path("/mail/{id}/send")
+    public Topic sendCampaignMail(//
+            @PathParam("id") long mailId,//
+            @HeaderParam("Cookie") ClientState cookie) {
+        log.info("send campaign mail " + mailId);
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            Topic mail = dms.getTopic(mailId, false, cookie);
+            RelatedTopic campaign = mail.getRelatedTopic("dm4.core.association",
+                    "dm4.core.default", "dm4.core.default", CAMPAIGN, false, false, cookie);
+
+            // associate recipients of query result
+            for (Topic recipient : queryCampaignRecipients(campaign)) {
+                mailService.associateRecipient(mailId,
+                        dms.getTopic(recipient.getId(), true, cookie), RecipientType.BCC, cookie);
+            }
+
+            tx.success();
+            return mailService.send(new Mail(mailId, dms, cookie));
+        } catch (Exception e) {
+            throw new WebApplicationException(new RuntimeException(//
+                    "send campaign mail \"" + mailId + "\" failed", e));
         } finally {
             tx.finish();
         }
@@ -245,13 +282,13 @@ public class PoemSpacePlugin extends PluginActivator implements //
         if (criteriaIterator.hasNext()) {
             String uri = criteriaIterator.next();
             Set<RelatedTopic> topics = criterionMap.get(uri);
-            Set<Topic> and = getCriterionRecipients(campaign, topics, searchTypeUris);
+            Set<Topic> and = getCriterionRecipients(topics, searchTypeUris);
             recipients.addAll(and);
             if (recipients.isEmpty() == false) { // merge each other list
                 while (criteriaIterator.hasNext()) {
                     uri = criteriaIterator.next();
                     topics = criterionMap.get(uri);
-                    and = getCriterionRecipients(campaign, topics, searchTypeUris);
+                    and = getCriterionRecipients(topics, searchTypeUris);
                     // TODO use iterator instead of cloned list
                     // TODO use map by ID to simplify contain check
                     for (Topic topic : new ArrayList<Topic>(recipients)) {
@@ -297,14 +334,13 @@ public class PoemSpacePlugin extends PluginActivator implements //
     /**
      * Returns parent aggregates of each criterion.
      * 
-     * @param campaign
      * @param criterionList
      *            criterion topics
      * @param searchTypeUris
      *            topic type URIs of possible recipients
      * @return
      */
-    private Set<Topic> getCriterionRecipients(Topic campaign, Set<RelatedTopic> criterionList,
+    private Set<Topic> getCriterionRecipients(Set<RelatedTopic> criterionList,
             Set<String> searchTypeUris) {
         Set<Topic> recipients = new HashSet<Topic>();
         for (Topic criterion : criterionList) {
@@ -339,6 +375,7 @@ public class PoemSpacePlugin extends PluginActivator implements //
 
     private Association createOrUpdateRecipient(String typeUri, long campaignId, long recipientId,
             ClientState clientState) {
+        log.fine("create recipient " + typeUri + " association");
         Set<Association> associations = dms.getAssociations(campaignId, recipientId);
         if (associations.size() > 1) {
             throw new IllegalStateException("only one association is supported");
@@ -348,7 +385,6 @@ public class PoemSpacePlugin extends PluginActivator implements //
             association.setTypeUri(typeUri);
             return association; // only one association can be used
         }
-        log.fine("create recipient " + typeUri + " association");
         return dms.createAssociation(new AssociationModel(typeUri,//
                 new TopicRoleModel(campaignId, "dm4.core.default"),//
                 new TopicRoleModel(recipientId, "dm4.core.default"), null), clientState);

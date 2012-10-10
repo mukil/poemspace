@@ -33,6 +33,7 @@ public class Migration3 extends Migration {
 
         // add criteria type aggregations
         List<String> criteriaTypeUris = new CriteriaCache(dms).getTypeUris();
+        addCriteriaAssocDefs("dm4.poemspace.campaign", criteriaTypeUris);
         addCriteriaAssocDefs("dm4.contacts.person", criteriaTypeUris);
         addCriteriaAssocDefs("dm4.contacts.institution", criteriaTypeUris);
     }

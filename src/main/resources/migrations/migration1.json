@@ -2,12 +2,6 @@
 {
     topic_types: [
         {
-            value: "Account",
-            uri: "dm4.poemspace.account",
-            data_type_uri: "dm4.core.text",
-            index_mode_uris: ["dm4.core.fulltext"]
-        },
-        {
             value: "Bezirk",
             uri: "dm4.poemspace.bezirk",
             data_type_uri: "dm4.core.text",
@@ -85,6 +79,7 @@
             value: "Distribution List",
             uri: "dm4.poemspace.list",
             data_type_uri: "dm4.core.composite",
+            label_config: [ "dm4.poemspace.listname" ],
             assoc_defs: [
                 {
                     part_topic_type_uri:  "dm4.poemspace.listname",
@@ -92,15 +87,12 @@
                     assoc_type_uri:       "dm4.core.composition_def"
                 }
             ],
-            label_config: [
-                dm4.poemspace.listname
-            ],
             view_config_topics: [
                 {
                     type_uri: "dm4.webclient.view_config",
                     composite: {
                         dm4.webclient.icon: "com.poemspace.dm4-poemspace/images/lists.png",
-                        dm4.webclient.add_to_create_menu: true,
+                        dm4.webclient.add_to_create_menu: false,
                         dm4.webclient.is_searchable_unit: true
                     }
                 }

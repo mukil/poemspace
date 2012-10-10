@@ -15,100 +15,33 @@
             ]
         },
         {
-            value: "Template Name",
-            uri: "dm4.poemspace.template.name",
-            data_type_uri: "dm4.core.text"
-        },
-        {
-            value: "Mail Template",
-            uri: "dm4.poemspace.template",
-            data_type_uri: "dm4.core.composite",
-            assoc_defs: [
-                {
-                    part_topic_type_uri:   "dm4.poemspace.template.name",
-                    part_cardinality_uri:  "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def"
-                },
-                {
-                    part_topic_type_uri:   "dm4.mail.from",
-                    part_cardinality_uri:  "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def"
-                },
-                {
-                    part_topic_type_uri:   "dm4.mail.body",
-                    part_cardinality_uri:  "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def"
-                }
-            ],
-            label_config: [ "dm4.poemspace.template.name" ],
-            view_config_topics: [
-                {
-                    type_uri: "dm4.webclient.view_config",
-                    composite: {
-                        dm4.webclient.icon: "com.poemspace.dm4-poemspace/images/template.png",
-                        dm4.webclient.add_to_create_menu: true,
-                        dm4.webclient.is_searchable_unit: true
-                    }
-                }
-            ]
+            value: "Recipient Count",
+            uri: "dm4.poemspace.campaign.count",
+            data_type_uri: "dm4.core.number"
         },
         {
             value: "Mail Campaign",
             uri: "dm4.poemspace.campaign",
             data_type_uri: "dm4.core.composite",
+            label_config: [ "dm4.mail.subject" ],
             assoc_defs: [
                 {
                     part_topic_type_uri:   "dm4.mail.subject",
                     part_cardinality_uri:  "dm4.core.one",
-                    assoc_type_uri:        "dm4.core.composition_def",
-                    view_config_topics: [
-                        {
-                            type_uri: "dm4.webclient.view_config",
-                            composite: {
-                                dm4.webclient.simple_renderer_uri: "dm4.webclient.title_renderer"
-                            }
-                        }
-                    ]
-                },
-                {
-                    assoc_type_uri:        "dm4.core.aggregation_def",
-                    part_topic_type_uri:   "dm4.poemspace.template",
+                    assoc_type_uri:        "dm4.core.composition_def"
+                },{
+                    part_topic_type_uri:   "dm4.poemspace.campaign.count",
                     part_cardinality_uri:  "dm4.core.one",
-                    whole_cardinality_uri: "dm4.core.one"
-                },
-                {
-                    assoc_type_uri:        "dm4.core.aggregation_def",
-                    part_topic_type_uri:   "dm4.poemspace.bezirk",
-                    part_cardinality_uri:  "dm4.core.many",
-                    whole_cardinality_uri: "dm4.core.one"
-                },
-                {
-                    assoc_type_uri:        "dm4.core.aggregation_def",
-                    part_topic_type_uri:   "dm4.poemspace.kiez",
-                    part_cardinality_uri:  "dm4.core.many",
-                    whole_cardinality_uri: "dm4.core.one"
-                },
-                {
-                    assoc_type_uri:        "dm4.core.aggregation_def",
-                    part_topic_type_uri:   "dm4.poemspace.art",
-                    part_cardinality_uri:  "dm4.core.many",
-                    whole_cardinality_uri: "dm4.core.one"
-                },
-                {
-                    assoc_type_uri:        "dm4.core.aggregation_def",
-                    part_topic_type_uri:   "dm4.poemspace.gattung",
-                    part_cardinality_uri:  "dm4.core.many",
-                    whole_cardinality_uri: "dm4.core.one"
+                    assoc_type_uri:        "dm4.core.composition_def"
                 }
             ],
-            label_config: [ "dm4.mail.subject" ],
             view_config_topics: [
                 {
                     type_uri: "dm4.webclient.view_config",
                     composite: {
                         dm4.webclient.icon: "com.poemspace.dm4-poemspace/images/mailing.png",
                         dm4.webclient.page_renderer_uri: "dm4.poemspace.campaign.renderer",
-                        dm4.webclient.add_to_create_menu: true,
+                        dm4.webclient.add_to_create_menu: false,
                         dm4.webclient.is_searchable_unit: true
                     }
                 }
