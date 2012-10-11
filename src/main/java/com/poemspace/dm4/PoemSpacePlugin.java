@@ -44,6 +44,7 @@ import de.deepamehta.core.service.event.PluginServiceArrivedListener;
 import de.deepamehta.core.service.event.PluginServiceGoneListener;
 import de.deepamehta.plugins.mail.Mail;
 import de.deepamehta.plugins.mail.RecipientType;
+import de.deepamehta.plugins.mail.StatusReport;
 import de.deepamehta.plugins.mail.service.MailService;
 
 @Path("/poemspace")
@@ -222,7 +223,7 @@ public class PoemSpacePlugin extends PluginActivator implements //
      */
     @PUT
     @Path("/mail/{id}/send")
-    public Topic sendCampaignMail(//
+    public StatusReport sendCampaignMail(//
             @PathParam("id") long mailId,//
             @HeaderParam("Cookie") ClientState cookie) {
         log.info("send campaign mail " + mailId);
