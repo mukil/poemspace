@@ -3,11 +3,11 @@
 dm4c.add_plugin('dm4.poemspace.plugin', function () {
 
   this.getCriteriaTypes = function () {
-    return dm4c.restc.request('GET', 'poemspace/criteria-types')
+    return dm4c.restc.request('GET', '/poemspace/criteria-types')
   }
 
   this.getCampaignRecipients = function (campaignId) {
-    var uri = 'poemspace/campaign/' + campaignId + '/recipients'
+    var uri = '/poemspace/campaign/' + campaignId + '/recipients'
     return dm4c.restc.request('GET', uri)
   }
 
@@ -51,25 +51,25 @@ dm4c.add_plugin('dm4.poemspace.plugin', function () {
     // copy mail if send before or a recipient is associated
     if ((sentDate && $.isEmptyObject(sentDate.value) === false) // send?
       || getMailRecipients(dm4c.selected_object.id).total_count > 0) { // associated recipients?
-      var uri = 'mail/' + dm4c.selected_object.id + '/copy?recipients=false',
+      var uri = '/mail/' + dm4c.selected_object.id + '/copy?recipients=false',
         mail = dm4c.restc.request('POST', uri)
       dm4c.show_topic(new Topic(mail), 'show')
     }
-    var campaign = dm4c.restc.request('PUT', 'poemspace/mail/' + dm4c.selected_object.id + '/start')
+    var campaign = dm4c.restc.request('PUT', '/poemspace/mail/' + dm4c.selected_object.id + '/start')
     dm4c.do_reveal_related_topic(campaign.id)
     dm4c.show_topic(new Topic(campaign), 'edit')
   }
 
   function sendCampaignMail() {
     if (isCampaignMail(dm4c.selected_object.id)) {
-      return dm4c.restc.request('PUT', 'poemspace/mail/' + dm4c.selected_object.id + '/send')
+      return dm4c.restc.request('PUT', '/poemspace/mail/' + dm4c.selected_object.id + '/send')
     }
   }
 
   function copyCampaignMail() {
     var campaigns = getCampaignsOfMail(dm4c.selected_object.id)
     if (campaigns.total_count > 0) { // campaign mail
-      var mail = dm4c.restc.request('POST', 'mail/' + dm4c.selected_object.id + '/copy?recipients=false')
+      var mail = dm4c.restc.request('POST', '/mail/' + dm4c.selected_object.id + '/copy?recipients=false')
       dm4c.restc.create_association({
         type_uri: 'dm4.core.association',
         role_1: { topic_id: mail.id, role_type_uri: 'dm4.core.default' },
@@ -82,7 +82,7 @@ dm4c.add_plugin('dm4.poemspace.plugin', function () {
 
   function createCriteria() {
     dm4c.ui.prompt('New Criteria', 'Name', 'Add', function (name) {
-      var uri = 'poemspace/criteria/' + name,
+      var uri = '/poemspace/criteria/' + name,
         criteria = dm4c.restc.request('POST', uri)
       // FIXME update client type cache without another server interaction
       dm4c.do_update_topic_type(criteria)

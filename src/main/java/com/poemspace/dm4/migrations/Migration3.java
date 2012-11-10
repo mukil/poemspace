@@ -27,10 +27,10 @@ public class Migration3 extends Migration {
     public void run() {
 
         // configure individual icons
-        changeIcon("dm4.contacts.institution", "com.poemspace.dm4-poemspace/images/birdhouse.png");
-        changeIcon("dm4.contacts.person", "com.poemspace.dm4-poemspace/images/bird.png");
-        changeIcon("dm4.notes.note", "com.poemspace.dm4-poemspace/images/pen.png");
-        changeIcon("dm4.webclient.search", "com.poemspace.dm4-poemspace/images/bullseye.png");
+        changeIcon("dm4.contacts.institution", "/com.poemspace.dm4-poemspace/images/birdhouse.png");
+        changeIcon("dm4.contacts.person", "/com.poemspace.dm4-poemspace/images/bird.png");
+        changeIcon("dm4.notes.note", "/com.poemspace.dm4-poemspace/images/pen.png");
+        changeIcon("dm4.webclient.search", "/com.poemspace.dm4-poemspace/images/bullseye.png");
 
         // add criteria type aggregations
         List<String> criteriaTypeUris = new CriteriaCache(dms).getTypeUris();

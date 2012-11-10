@@ -37,12 +37,12 @@
   }
 
   function includeRecipient(campaignId, recipientId) {
-    var uri = 'poemspace/campaign/' + campaignId + '/include/' + recipientId
+    var uri = '/poemspace/campaign/' + campaignId + '/include/' + recipientId
     return dm4c.restc.request('POST', uri).items
   }
 
   function excludeRecipient(campaignId, recipientId) {
-    var uri = 'poemspace/campaign/' + campaignId + '/exclude/' + recipientId
+    var uri = '/poemspace/campaign/' + campaignId + '/exclude/' + recipientId
     return dm4c.restc.request('POST', uri).items
   }
 
