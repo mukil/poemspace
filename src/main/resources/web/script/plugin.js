@@ -79,6 +79,12 @@ dm4c.add_plugin('dm4.poemspace.plugin', function () {
     }
   }
 
+  function showCampaignMail() {
+    var campaigns = getCampaignsOfMail(dm4c.selected_object.id)
+    if (campaigns.total_count > 0) { // campaign mail
+      dm4c.do_reveal_related_topic(campaigns.items[0].id)
+    }
+  }
 
   function createCriteria() {
     dm4c.ui.prompt('New Criteria', 'Name', 'Add', function (name) {
@@ -128,6 +134,7 @@ dm4c.add_plugin('dm4.poemspace.plugin', function () {
   dm4c.add_listener('render_mail_recipients', renderMailRecipients)
   dm4c.add_listener('send_mail', sendCampaignMail)
   dm4c.add_listener('copy_mail', copyCampaignMail)
+  dm4c.add_listener('show_mail', showCampaignMail)
 
   dm4c.add_listener('post_refresh_create_menu', function (menu) {
     if (!dm4c.has_create_permission('dm4.poemspace.campaign')) {

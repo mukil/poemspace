@@ -39,9 +39,7 @@ import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.PluginService;
-import de.deepamehta.core.service.event.InitializePluginListener;
-import de.deepamehta.core.service.event.PluginServiceArrivedListener;
-import de.deepamehta.core.service.event.PluginServiceGoneListener;
+import de.deepamehta.core.service.annotation.ConsumesService;
 import de.deepamehta.plugins.mail.Mail;
 import de.deepamehta.plugins.mail.RecipientType;
 import de.deepamehta.plugins.mail.StatusReport;
@@ -49,10 +47,7 @@ import de.deepamehta.plugins.mail.service.MailService;
 
 @Path("/poemspace")
 @Produces(MediaType.APPLICATION_JSON)
-public class PoemSpacePlugin extends PluginActivator implements //
-        InitializePluginListener,//
-        PluginServiceArrivedListener,//
-        PluginServiceGoneListener {
+public class PoemSpacePlugin extends PluginActivator {
 
     private static final String CAMPAIGN = "dm4.poemspace.campaign";
 
@@ -253,13 +248,14 @@ public class PoemSpacePlugin extends PluginActivator implements //
      * Initialize criteria cache.
      */
     @Override
-    public void initializePlugin() {
+    public void init() {
         // TODO add update listener to reload cache (create, update, delete)
         criteria = new CriteriaCache(dms);
     }
 
     @Override
-    public void pluginServiceArrived(PluginService service) {
+    @ConsumesService("de.deepamehta.plugins.mail.service.MailService")
+    public void serviceArrived(PluginService service) {
         if (service instanceof MailService) {
             log.fine("mail service arrived");
             mailService = (MailService) service;
@@ -267,7 +263,7 @@ public class PoemSpacePlugin extends PluginActivator implements //
     }
 
     @Override
-    public void pluginServiceGone(PluginService service) {
+    public void serviceGone(PluginService service) {
         if (service == mailService) {
             mailService = null;
         }
@@ -381,14 +377,21 @@ public class PoemSpacePlugin extends PluginActivator implements //
         if (associations.size() > 1) {
             throw new IllegalStateException("only one association is supported");
         }
-        for (Association association : associations) {
-            log.fine("update recipient " + typeUri + " association");
-            association.setTypeUri(typeUri);
-            return association; // only one association can be used
+        DeepaMehtaTransaction tx = dms.beginTx();
+        try {
+            for (Association association : associations) {
+                log.fine("update recipient " + typeUri + " association");
+                association.setTypeUri(typeUri);
+                return association; // only one association can be used
+            }
+            Association association = dms.createAssociation(new AssociationModel(typeUri,//
+                    new TopicRoleModel(campaignId, "dm4.core.default"),//
+                    new TopicRoleModel(recipientId, "dm4.core.default"), null), clientState);
+            tx.success();
+            return association;
+        } finally {
+            tx.finish();
         }
-        return dms.createAssociation(new AssociationModel(typeUri,//
-                new TopicRoleModel(campaignId, "dm4.core.default"),//
-                new TopicRoleModel(recipientId, "dm4.core.default"), null), clientState);
     }
 
 }

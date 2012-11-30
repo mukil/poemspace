@@ -82,7 +82,7 @@
             label_config: [ "dm4.poemspace.listname" ],
             assoc_defs: [
                 {
-                    part_topic_type_uri:  "dm4.poemspace.listname",
+                    part_type_uri:  "dm4.poemspace.listname",
                     part_cardinality_uri: "dm4.core.one",
                     assoc_type_uri:       "dm4.core.composition_def"
                 }

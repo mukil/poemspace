@@ -26,11 +26,11 @@
             label_config: [ "dm4.mail.subject" ],
             assoc_defs: [
                 {
-                    part_topic_type_uri:   "dm4.mail.subject",
+                    part_type_uri:   "dm4.mail.subject",
                     part_cardinality_uri:  "dm4.core.one",
                     assoc_type_uri:        "dm4.core.composition_def"
                 },{
-                    part_topic_type_uri:   "dm4.poemspace.campaign.count",
+                    part_type_uri:   "dm4.poemspace.campaign.count",
                     part_cardinality_uri:  "dm4.core.one",
                     assoc_type_uri:        "dm4.core.composition_def"
                 }
