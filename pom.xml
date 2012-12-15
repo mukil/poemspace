@@ -23,6 +23,11 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
     <dependencies>
         <dependency>
             <groupId>de.deepamehta</groupId>
+            <artifactId>deepamehta-accesscontrol</artifactId>
+            <version>4.0.13-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-webservice</artifactId>
             <version>4.0.13-SNAPSHOT</version>
         </dependency>

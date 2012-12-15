@@ -23,6 +23,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
 import de.deepamehta.core.Association;
+import de.deepamehta.core.DeepaMehtaObject;
 import de.deepamehta.core.DeepaMehtaTransaction;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
@@ -39,7 +40,12 @@ import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.PluginService;
+import de.deepamehta.core.service.accesscontrol.ACLEntry;
+import de.deepamehta.core.service.accesscontrol.AccessControlList;
+import de.deepamehta.core.service.accesscontrol.Operation;
+import de.deepamehta.core.service.accesscontrol.UserRole;
 import de.deepamehta.core.service.annotation.ConsumesService;
+import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
 import de.deepamehta.plugins.mail.Mail;
 import de.deepamehta.plugins.mail.RecipientType;
 import de.deepamehta.plugins.mail.StatusReport;
@@ -59,9 +65,13 @@ public class PoemSpacePlugin extends PluginActivator {
 
     private static Logger log = Logger.getLogger(PoemSpacePlugin.class.getName());
 
+    private AccessControlService acService;
+
     private CriteriaCache criteria = null;
 
     private MailService mailService;
+
+    private boolean isInitialized;
 
     public static final Comparator<Topic> VALUE_COMPARATOR = new Comparator<Topic>() {
         @Override
@@ -245,27 +255,76 @@ public class PoemSpacePlugin extends PluginActivator {
     }
 
     /**
-     * Initialize criteria cache.
+     * Initialize.
      */
     @Override
     public void init() {
-        // TODO add update listener to reload cache (create, update, delete)
-        criteria = new CriteriaCache(dms);
+        isInitialized = true;
+        configureIfReady();
     }
 
     @Override
-    @ConsumesService("de.deepamehta.plugins.mail.service.MailService")
+    @ConsumesService({ "de.deepamehta.plugins.accesscontrol.service.AccessControlService",
+            "de.deepamehta.plugins.mail.service.MailService" })
     public void serviceArrived(PluginService service) {
-        if (service instanceof MailService) {
-            log.fine("mail service arrived");
+        if (service instanceof AccessControlService) {
+            acService = (AccessControlService) service;
+        } else if (service instanceof MailService) {
             mailService = (MailService) service;
+        }
+        configureIfReady();
+    }
+
+    private void configureIfReady() {
+        if (isInitialized && acService != null && mailService != null) {
+            // TODO add update listener to reload cache (create, update, delete)
+            criteria = new CriteriaCache(dms);
+            checkACLsOfMigration();
         }
     }
 
     @Override
     public void serviceGone(PluginService service) {
-        if (service == mailService) {
+        if (service == acService) {
+            acService = null;
+        } else if (service == mailService) {
             mailService = null;
+        }
+    }
+
+    private void checkACLsOfMigration() {
+        for (String typeUri : new String[] { "dm4.poemspace.project", //
+                "dm4.poemspace.year", //
+                "dm4.poemspace.affiliation", //
+                "dm4.poemspace.workarea", //
+                "dm4.poemspace.media", //
+                "dm4.poemspace.art", //
+                "dm4.poemspace.gattung" }) {
+            checkACLsOfTopics(typeUri);
+        }
+    }
+
+    // private void checkACLsOfAssociations(String typeUri) {
+    // for (RelatedAssociation topic : dms.getAssociations(typeUri)) {
+    // checkACLsOfObject(topic);
+    // }
+    // }
+
+    private void checkACLsOfTopics(String typeUri) {
+        for (RelatedTopic topic : dms.getTopics(typeUri, false, 0, null)) {
+            checkACLsOfObject(topic);
+        }
+    }
+
+    private void checkACLsOfObject(DeepaMehtaObject instance) {
+        if (acService.getCreator(instance.getId()) == null) {
+            log.info("initial ACL update " + instance.getId() + ": " + instance.getSimpleValue());
+            Topic admin = acService.getUsername("admin");
+            String adminName = admin.getSimpleValue().toString();
+            acService.setCreator(instance.getId(), adminName);
+            acService.setOwner(instance.getId(), adminName);
+            acService.createACL(instance.getId(), new AccessControlList( //
+                    new ACLEntry(Operation.WRITE, UserRole.OWNER)));
         }
     }
 

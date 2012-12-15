@@ -1,16 +1,16 @@
-# project criteria type and instances
+# affiliation criteria type and instances
 {
     topic_types: [
         {
-            value: "Projekt",
-            uri: "dm4.poemspace.project",
+            value: "Affiliation",
+            uri: "dm4.poemspace.affiliation",
             data_type_uri: "dm4.core.text",
             index_mode_uris: ["dm4.core.fulltext"],
             view_config_topics: [
                 {
                     type_uri: "dm4.webclient.view_config",
                     composite: {
-                        dm4.webclient.icon: "/de.deepamehta.workspaces/images/star.png",
+                        dm4.webclient.icon: "/de.deepamehta.webclient/images/ball-gray.png",
                         dm4.webclient.multi_renderer_uri: "dm4.webclient.checkbox_renderer",
                         dm4.webclient.add_to_create_menu: true,
                         dm4.webclient.is_searchable_unit: true
@@ -27,27 +27,35 @@
                 role_type_uri: "dm4.core.default"
             },
             role_2: {
-                topic_uri: "dm4.poemspace.project",
+                topic_uri: "dm4.poemspace.affiliation",
                 role_type_uri: "dm4.core.default"
             }
         }
     ],
     topics: [
         {
-            type_uri: "dm4.poemspace.project",
-            value: "Meister"
+            type_uri: "dm4.poemspace.affiliation",
+            value: "Förderer"
         },
         {
-            type_uri: "dm4.poemspace.project",
-            value: "Poesiefrühling"
+            type_uri: "dm4.poemspace.affiliation",
+            value: "Kooppartner"
         },
         {
-            type_uri: "dm4.poemspace.project",
-            value: "Poem Space Mobil"
+            type_uri: "dm4.poemspace.affiliation",
+            value: "Künstler"
         },
         {
-            type_uri: "dm4.poemspace.project",
-            value: "wortwedding"
+            type_uri: "dm4.poemspace.affiliation",
+            value: "Mitstreiter"
+        },
+        {
+            type_uri: "dm4.poemspace.affiliation",
+            value: "Pädagoge"
+        },
+        {
+            type_uri: "dm4.poemspace.affiliation",
+            value: "Publikum"
         }
     ]
 }
