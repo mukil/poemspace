@@ -2,15 +2,15 @@
 {
     topic_types: [
         {
-            value: "Medium",
-            uri: "dm4.poemspace.media",
+            value: "Kulturelle Bildung",
+            uri: "dm4.poemspace.education",
             data_type_uri: "dm4.core.text",
             index_mode_uris: ["dm4.core.fulltext"],
             view_config_topics: [
                 {
                     type_uri: "dm4.webclient.view_config",
                     composite: {
-                        dm4.webclient.icon: "/de.deepamehta.webclient/images/ball-gray.png",
+                        dm4.webclient.icon: "/com.poemspace.dm4-poemspace/images/dinosaur.png",
                         dm4.webclient.multi_renderer_uri: "dm4.webclient.checkbox_renderer",
                         dm4.webclient.add_to_create_menu: true,
                         dm4.webclient.is_searchable_unit: true
@@ -27,35 +27,31 @@
                 role_type_uri: "dm4.core.default"
             },
             role_2: {
-                topic_uri: "dm4.poemspace.media",
+                topic_uri: "dm4.poemspace.education",
                 role_type_uri: "dm4.core.default"
             }
         }
     ],
     topics: [
         {
-            type_uri: "dm4.poemspace.media",
-            value: "Lokal"
+            type_uri: "dm4.poemspace.education",
+            value: "Lehrer"
         },
         {
-            type_uri: "dm4.poemspace.media",
-            value: "Regional"
+            type_uri: "dm4.poemspace.education",
+            value: "Schulleiter"
         },
         {
-            type_uri: "dm4.poemspace.media",
-            value: "Überregional"
+            type_uri: "dm4.poemspace.education",
+            value: "Kunstvermittler"
         },
         {
-            type_uri: "dm4.poemspace.media",
-            value: "Radio"
+            type_uri: "dm4.poemspace.education",
+            value: "Pädagoge"
         },
         {
-            type_uri: "dm4.poemspace.media",
-            value: "Fernsehen"
-        },
-        {
-            type_uri: "dm4.poemspace.media",
-            value: "Web"
+            type_uri: "dm4.poemspace.education",
+            value: "Bibliothekar"
         }
     ]
 }

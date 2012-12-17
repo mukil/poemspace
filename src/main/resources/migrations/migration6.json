@@ -10,7 +10,7 @@
                 {
                     type_uri: "dm4.webclient.view_config",
                     composite: {
-                        dm4.webclient.icon: "/de.deepamehta.webclient/images/ball-gray.png",
+                        dm4.webclient.icon: "/com.poemspace.dm4-poemspace/images/heart.png",
                         dm4.webclient.multi_renderer_uri: "dm4.webclient.checkbox_renderer",
                         dm4.webclient.add_to_create_menu: true,
                         dm4.webclient.is_searchable_unit: true
@@ -48,10 +48,6 @@
         {
             type_uri: "dm4.poemspace.affiliation",
             value: "Mitstreiter"
-        },
-        {
-            type_uri: "dm4.poemspace.affiliation",
-            value: "Pädagoge"
         },
         {
             type_uri: "dm4.poemspace.affiliation",

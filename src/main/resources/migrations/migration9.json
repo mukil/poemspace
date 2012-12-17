@@ -1,13 +1,41 @@
-# new art criteria instances
+# media criteria type and instances
 {
-   topics: [
-        { # Café, Restaurant
-            type_uri: "dm4.poemspace.art",
-            value: "Café/Restaurant"
+    topic_types: [
+        {
+            value: "Öffentlichkeitsarbeit",
+            uri: "dm4.poemspace.public",
+            data_type_uri: "dm4.core.text",
+            index_mode_uris: ["dm4.core.fulltext"],
+            view_config_topics: [
+                {
+                    type_uri: "dm4.webclient.view_config",
+                    composite: {
+                        dm4.webclient.icon: "/com.poemspace.dm4-poemspace/images/tree.png",
+                        dm4.webclient.multi_renderer_uri: "dm4.webclient.checkbox_renderer",
+                        dm4.webclient.add_to_create_menu: true,
+                        dm4.webclient.is_searchable_unit: true
+                    }
+                }
+            ]
         },
-        { # Jugendclub, Kinderclub
-            type_uri: "dm4.poemspace.art",
-            value: "Kinder- und Jugendeinrichtung"
+    ],
+    associations: [
+        {
+            type_uri: "dm4.core.association",
+            role_1: {
+                topic_uri: "dm4.poemspace.criteria.type",
+                role_type_uri: "dm4.core.default"
+            },
+            role_2: {
+                topic_uri: "dm4.poemspace.public",
+                role_type_uri: "dm4.core.default"
+            }
+        }
+    ],
+    topics: [
+        {
+            type_uri: "dm4.poemspace.public",
+            value: "Webseite"
         }
     ]
 }

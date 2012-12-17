@@ -56,7 +56,7 @@ dm4c.add_plugin('dm4.poemspace.plugin', function () {
       dm4c.show_topic(new Topic(mail), 'show')
     }
     var campaign = dm4c.restc.request('PUT', '/poemspace/mail/' + dm4c.selected_object.id + '/start')
-    dm4c.do_reveal_related_topic(campaign.id)
+    dm4c.do_reveal_related_topic(campaign.id, 'show')
     dm4c.show_topic(new Topic(campaign), 'edit')
   }
 
@@ -82,7 +82,7 @@ dm4c.add_plugin('dm4.poemspace.plugin', function () {
   function showCampaignMail() {
     var campaigns = getCampaignsOfMail(dm4c.selected_object.id)
     if (campaigns.total_count > 0) { // campaign mail
-      dm4c.do_reveal_related_topic(campaigns.items[0].id)
+      dm4c.do_reveal_related_topic(campaigns.items[0].id, 'show')
     }
   }
 

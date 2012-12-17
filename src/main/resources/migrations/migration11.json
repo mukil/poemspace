@@ -1,0 +1,13 @@
+# new kind criteria instances
+{
+   topics: [
+        { # Café, Restaurant
+            type_uri: "dm4.poemspace.gattung",
+            value: "Schauspiel"
+        },
+        { # Jugendclub, Kinderclub
+            type_uri: "dm4.poemspace.gattung",
+            value: "Tanz"
+        }
+    ]
+}

@@ -4,6 +4,7 @@ import static com.poemspace.dm4.MigrationUtils.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
@@ -13,90 +14,107 @@ import de.deepamehta.core.service.Migration;
 
 public class Migration13 extends Migration {
 
+    private static Logger log = Logger.getLogger(Migration12.class.getName());
+
     @SuppressWarnings("serial")
     @Override
     public void run() {
 
         // get criteria topics
-        final Map<String, Long> art = getIdsByValue(dms, ART);
-        final Map<String, Long> area = getIdsByValue(dms, AREA);
-        final Map<String, Long> media = getIdsByValue(dms, MEDIA);
+        final Map<String, Long> projects = getIdsByValue(dms, PROJECT);
+        final Map<String, Long> years = getIdsByValue(dms, YEAR);
+        final Map<String, Long> affiliations = getIdsByValue(dms, AFFILIATION);
+        final Map<String, Long> publics = getIdsByValue(dms, PUBLIC);
 
         // define mapping
         Map<String, Map<String, Long>> MAP = new HashMap<String, Map<String, Long>>();
-        MAP.put("Café", new HashMap<String, Long>() {
+        MAP.put("Mitstreiter10", new HashMap<String, Long>() {
             {
-                put(ART, art.get("Café/Restaurant"));
+                put(PROJECT, projects.get("Poesiefrühling"));
+                put(YEAR, years.get("2010"));
+                put(AFFILIATION, affiliations.get("Mitstreiter"));
             }
         });
-        MAP.put("Jugendclub", new HashMap<String, Long>() {
+        MAP.put("Mitstreiter11", new HashMap<String, Long>() {
             {
-                put(ART, art.get("Kinder- und Jugendeinrichtung"));
+                put(PROJECT, projects.get("Poesiefrühling"));
+                put(YEAR, years.get("2011"));
+                put(AFFILIATION, affiliations.get("Mitstreiter"));
             }
         });
-        MAP.put("Kinderclub", new HashMap<String, Long>() {
+        MAP.put("Mitstreiter 12", new HashMap<String, Long>() {
             {
-                put(ART, art.get("Kinder- und Jugendeinrichtung"));
+                put(PROJECT, projects.get("Poesiefrühling"));
+                put(YEAR, years.get("2012"));
+                put(AFFILIATION, affiliations.get("Mitstreiter"));
             }
         });
-        MAP.put("Kulturelle Bildung", new HashMap<String, Long>() {
+        MAP.put("Printemps des Poètes Berlin09", new HashMap<String, Long>() {
             {
-                put(AREA, area.get("Kulturelle Bildung"));
+                put(PROJECT, projects.get("Poesiefrühling"));
+                put(YEAR, years.get("2009"));
             }
         });
-        MAP.put("Radio", new HashMap<String, Long>() {
+        MAP.put("Printemps des Poètes, Berlin10", new HashMap<String, Long>() {
             {
-                put(AREA, area.get("Presse"));
-                put(MEDIA, media.get("Radio"));
+                put(PROJECT, projects.get("Poesiefrühling"));
+                put(YEAR, years.get("2010"));
             }
         });
-        MAP.put("Radio regional", new HashMap<String, Long>() {
+        MAP.put("Poesiefrühling-2011", new HashMap<String, Long>() {
             {
-                put(AREA, area.get("Presse"));
+                put(PROJECT, projects.get("Poesiefrühling"));
+                put(YEAR, years.get("2011"));
             }
         });
-        MAP.put("Radio Überregional", new HashMap<String, Long>() {
+        MAP.put("Poesiefrühling 2012", new HashMap<String, Long>() {
             {
-                put(AREA, area.get("Presse"));
-            }
-        });
-        MAP.put("regionale Printmedien", new HashMap<String, Long>() {
-            {
-                put(AREA, area.get("Presse"));
-                put(MEDIA, media.get("Regional"));
-            }
-        });
-        MAP.put("Restaurant", new HashMap<String, Long>() {
-            {
-                put(ART, art.get("Café/Restaurant"));
-            }
-        });
-        MAP.put("TV", new HashMap<String, Long>() {
-            {
-                put(AREA, area.get("Presse"));
-                put(MEDIA, media.get("Fernsehen"));
-            }
-        });
-        MAP.put("Überregionale Print", new HashMap<String, Long>() {
-            {
-                put(AREA, area.get("Presse"));
-                put(MEDIA, media.get("Überregional"));
-            }
-        });
-        MAP.put("Websites", new HashMap<String, Long>() {
-            {
-                put(AREA, area.get("Presse"));
-                put(MEDIA, media.get("Web"));
-            }
-        });
-        MAP.put("Zeitschrift", new HashMap<String, Long>() {
-            {
-                put(AREA, area.get("Presse"));
+                put(PROJECT, projects.get("Poesiefrühling"));
+                put(YEAR, years.get("2012"));
             }
         });
 
-        for (Topic artType : dms.getTopics(ART, false, 0, null)) {
-            Map<String, Long> criteria = MAP.get(artType.getSimpleValue().toString());
+        MAP.put("MeisterInnen12", new HashMap<String, Long>() {
+            {
+                put(PROJECT, projects.get("Meister"));
+                put(YEAR, years.get("2012"));
+            }
+        });
+        MAP.put("MeisterInnen13", new HashMap<String, Long>() {
+            {
+                put(PROJECT, projects.get("Meister"));
+                put(YEAR, years.get("2013"));
+            }
+        });
+
+        MAP.put("wortwedding", new HashMap<String, Long>() {
+            {
+                put(PROJECT, projects.get("wortwedding"));
+                put(AFFILIATION, affiliations.get("Publikum"));
+            }
+        });
+
+        MAP.put("Poem Space Mobil", new HashMap<String, Long>() {
+            {
+                put(PROJECT, projects.get("Poem Space Mobil"));
+            }
+        });
+
+        MAP.put("Stiftungen", new HashMap<String, Long>() {
+            {
+                put(AFFILIATION, affiliations.get("Förderer"));
+            }
+        });
+        MAP.put("Blogs", new HashMap<String, Long>() {
+            {
+                put(PUBLIC, publics.get("Webseite"));
+            }
+        });
+
+        for (Topic list : dms.getTopics(LIST, false, 0, null)) {
+            String listName = list.getSimpleValue().toString();
+            log.info("reassign members of list " + listName);
+            Map<String, Long> criteria = MAP.get(listName);
             if (criteria != null) {
                 // map composite value
                 CompositeValue valueUpdate = new CompositeValue();
@@ -105,12 +123,14 @@ public class Migration13 extends Migration {
                 }
 
                 // update all related contacts
-                for (RelatedTopic contact : artType.getRelatedTopics("dm4.core.aggregation", //
-                        "dm4.core.part", "dm4.core.whole", null, false, false, 0, null)) {
-                    contact.setCompositeValue(valueUpdate, null, null);
+                for (String contactType : CONTACT_URIS) {
+                    for (RelatedTopic contact : list.getRelatedTopics("dm4.core.association", //
+                            null, null, contactType, false, false, 0, null)) {
+                        log.info("update " + listName + " contact " + contact.getSimpleValue());
+                        contact.setCompositeValue(valueUpdate, null, null);
+                    }
                 }
             }
         }
     }
-
 }

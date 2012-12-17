@@ -27,7 +27,9 @@
     return dm4c.restc.get_topic_related_topics(criteria.id, {
       assoc_type_uri: 'dm4.core.instantiation',
       others_role_type_uri: 'dm4.core.instance'
-    }, null, null).items
+    }, null, null).items.sort(function (a, b) {
+        return (a.value < b.value) ? -1 : (a.value > b.value) ? 1 : 0
+    })
   }
 
   function getRecipientsById(campaignId, type) {
@@ -110,7 +112,7 @@
 
   function createRecipient(recipient, type) {
     function click() {
-      dm4c.do_reveal_related_topic(recipient.id)
+      dm4c.do_reveal_related_topic(recipient.id, 'show')
     }
 
     var $icon = dm4c.render.icon_link(recipient, click),

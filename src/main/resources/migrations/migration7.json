@@ -2,15 +2,15 @@
 {
     topic_types: [
         {
-            value: "Arbeitsbereich",
-            uri: "dm4.poemspace.workarea",
+            value: "Presse",
+            uri: "dm4.poemspace.press",
             data_type_uri: "dm4.core.text",
             index_mode_uris: ["dm4.core.fulltext"],
             view_config_topics: [
                 {
                     type_uri: "dm4.webclient.view_config",
                     composite: {
-                        dm4.webclient.icon: "/de.deepamehta.webclient/images/ball-gray.png",
+                        dm4.webclient.icon: "/com.poemspace.dm4-poemspace/images/newspaper.png",
                         dm4.webclient.multi_renderer_uri: "dm4.webclient.checkbox_renderer",
                         dm4.webclient.add_to_create_menu: true,
                         dm4.webclient.is_searchable_unit: true
@@ -27,19 +27,40 @@
                 role_type_uri: "dm4.core.default"
             },
             role_2: {
-                topic_uri: "dm4.poemspace.workarea",
+                topic_uri: "dm4.poemspace.press",
                 role_type_uri: "dm4.core.default"
             }
         }
     ],
+
     topics: [
         {
-            type_uri: "dm4.poemspace.workarea",
-            value: "Presse"
+            type_uri: "dm4.poemspace.press",
+            value: "lokal"
         },
         {
-            type_uri: "dm4.poemspace.workarea",
-            value: "Kulturelle Bildung"
+            type_uri: "dm4.poemspace.press",
+            value: "regional"
+        },
+        {
+            type_uri: "dm4.poemspace.press",
+            value: "überregional"
+        },
+        {
+            type_uri: "dm4.poemspace.press",
+            value: "Radio"
+        },
+        {
+            type_uri: "dm4.poemspace.press",
+            value: "Fernsehen"
+        },
+        {
+            type_uri: "dm4.poemspace.press",
+            value: "Print"
+        },
+        {
+            type_uri: "dm4.poemspace.press",
+            value: "Web"
         }
     ]
 }

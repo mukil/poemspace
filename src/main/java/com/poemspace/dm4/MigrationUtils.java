@@ -13,19 +13,24 @@ public class MigrationUtils {
 
     public static final String AFFILIATION = "dm4.poemspace.affiliation";
 
-    public static final String AREA = "dm4.poemspace.workarea";
-
     public static final String ART = "dm4.poemspace.art";
 
     public static final String LIST = "dm4.poemspace.list";
 
-    public static final String MEDIA = "dm4.poemspace.media";
+    public static final String PRESS = "dm4.poemspace.press";
 
     public static final String PROJECT = "dm4.poemspace.project";
+
+    public static final String PUBLIC = "dm4.poemspace.public";
 
     public static final String YEAR = "dm4.poemspace.year";
 
     public static String[] CONTACT_URIS = { "dm4.contacts.person", "dm4.contacts.institution" };
+
+    public static void changeIcon(DeepaMehtaService dms, String typeUri, String iconPath) {
+        dms.getTopicType(typeUri, null).getViewConfig()
+                .addSetting("dm4.webclient.view_config", "dm4.webclient.icon", iconPath);
+    }
 
     public static void addCriteriaAssocDefs(DeepaMehtaService dms, String typeUri,
             List<String> criteriaTypeUris) {

@@ -296,8 +296,9 @@ public class PoemSpacePlugin extends PluginActivator {
         for (String typeUri : new String[] { "dm4.poemspace.project", //
                 "dm4.poemspace.year", //
                 "dm4.poemspace.affiliation", //
-                "dm4.poemspace.workarea", //
-                "dm4.poemspace.media", //
+                "dm4.poemspace.press", //
+                "dm4.poemspace.education", //
+                "dm4.poemspace.public", //
                 "dm4.poemspace.art", //
                 "dm4.poemspace.gattung" }) {
             checkACLsOfTopics(typeUri);
