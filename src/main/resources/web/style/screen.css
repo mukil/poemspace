@@ -16,3 +16,7 @@
 .result {
   background-color: #D9EDF7;
 }
+
+.criterion-count {
+  padding-left: .3em;
+}

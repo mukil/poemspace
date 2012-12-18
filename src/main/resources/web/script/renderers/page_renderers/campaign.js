@@ -53,7 +53,10 @@
       $icon = dm4c.render.type_icon(criteria.uri).addClass('menu-icon'),
       $closed = $('<span>').addClass('ui-icon ui-icon-circle-triangle-s').css('float', 'right'),
       $open = $('<span>').addClass('ui-icon ui-icon-circle-triangle-n').css('float', 'right').hide(),
-      $legend = $('<p>').addClass('ui-state-default').append($icon).append(criteria.value).append($closed).append($open),
+      $count = $('<span>').addClass('criterion-count'),
+      $legend = $('<p>').addClass('ui-state-default')
+                        .append($icon).append(criteria.value)
+                        .append($count).append($closed).append($open),
       $criteria = $('<ul>').addClass('criteria').hide(),
       $fieldset = $('<div>').addClass('box level1').append($legend).append($criteria)
 
@@ -71,9 +74,12 @@
     })
 
     // check the aggregates
+    var checkedCount = 0;
     $.each(aggregates, function (o, aggregate) {
+      checkedCount++
       $criterionById[aggregate.id].attr('checked', true)
     })
+    $count.text(checkedCount)
 
     return $fieldset
   }
@@ -168,11 +174,15 @@
   function registerCriterionChange(campaign, $parent, $recipients) {
     $parent.on('change', 'input[type="checkbox"]', function () {
       var $input = $(this),
+        $count = $('span.criterion-count', $input.parent().parent().parent()),
         criterion = $input.data('criterion')
+
       if ($input.attr('checked')) {
         addCriterion(campaign.id, criterion.id)
+        $count.text(parseInt($count.text()) + 1)
       } else {
         deleteCriterion(campaign.id, criterion.id)
+        $count.text(parseInt($count.text()) - 1)
       }
       refreshRecipients()
     })
