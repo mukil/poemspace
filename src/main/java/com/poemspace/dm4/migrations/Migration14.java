@@ -94,10 +94,10 @@ public class Migration14 extends Migration {
             }
         });
 
-        for (Topic artType : dms.getTopics(ART, false, 0, null)) {
-            String artName = artType.getSimpleValue().toString();
-            log.info("reassign members of art " + artName);
-            Map<String, Long> criteria = MAP.get(artName);
+        for (Topic criterion : dms.getTopics(ART, false, 0, null)) {
+            String criterionName = criterion.getSimpleValue().toString();
+            log.info("reassign members of art criterion " + criterionName);
+            Map<String, Long> criteria = MAP.get(criterionName);
             if (criteria != null) {
                 // map composite value
                 CompositeValue valueUpdate = new CompositeValue();
@@ -106,11 +106,14 @@ public class Migration14 extends Migration {
                 }
 
                 // update all related contacts
-                for (RelatedTopic contact : artType.getRelatedTopics("dm4.core.aggregation", //
+                for (RelatedTopic contact : criterion.getRelatedTopics("dm4.core.aggregation", //
                         "dm4.core.part", "dm4.core.whole", null, false, false, 0, null)) {
-                    log.info("update " + artName + " contact " + contact.getSimpleValue());
+                    log.info("update " + criterionName + " contact " + contact.getSimpleValue());
                     contact.setCompositeValue(valueUpdate, null, null);
                 }
+
+                // delete distribution list
+                dms.deleteTopic(criterion.getId(), null);
             }
         }
     }

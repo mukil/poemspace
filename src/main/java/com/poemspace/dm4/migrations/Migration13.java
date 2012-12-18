@@ -130,6 +130,9 @@ public class Migration13 extends Migration {
                         contact.setCompositeValue(valueUpdate, null, null);
                     }
                 }
+
+                // delete distribution list
+                dms.deleteTopic(list.getId(), null);
             }
         }
     }

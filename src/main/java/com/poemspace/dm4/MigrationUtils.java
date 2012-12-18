@@ -1,7 +1,6 @@
 package com.poemspace.dm4;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import de.deepamehta.core.RelatedTopic;
@@ -33,7 +32,7 @@ public class MigrationUtils {
     }
 
     public static void addCriteriaAssocDefs(DeepaMehtaService dms, String typeUri,
-            List<String> criteriaTypeUris) {
+            String... criteriaTypeUris) {
         TopicType topicType = dms.getTopicType(typeUri, null);
         for (String uri : criteriaTypeUris) {
             topicType.addAssocDef(new AssociationDefinitionModel("dm4.core.aggregation_def",//
