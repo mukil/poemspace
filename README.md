@@ -9,4 +9,4 @@ The categories themself are configurable by the user.
 
 ## Requirements
 
-  * [DeepaMehta 4](http://github.com/jri/deepamehta) > 4.0.11
+  * [DeepaMehta 4](http://github.com/jri/deepamehta) > 4.0.12
