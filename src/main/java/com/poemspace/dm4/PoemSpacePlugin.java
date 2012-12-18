@@ -91,6 +91,13 @@ public class PoemSpacePlugin extends PluginActivator {
     }
 
     @POST
+    @Path("/criteria-reload")
+    public List<Topic> reloadCriteriaCache() {
+        criteria = new CriteriaCache(dms);
+        return getCriteriaTypes();
+    }
+
+    @POST
     @Path("/criteria/{name}")
     public Topic createCriteria(@PathParam("name") String name,
             @HeaderParam("Cookie") ClientState cookie) {

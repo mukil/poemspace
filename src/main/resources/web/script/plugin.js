@@ -41,6 +41,10 @@ dm4c.add_plugin('dm4.poemspace.plugin', function () {
     return dm4c.restc.get_topic_related_topics(topicId, { assoc_type_uri: 'dm4.mail.recipient' })
   }
 
+  function reloadCriteriaCache() {
+    return dm4c.restc.request('POST', '/poemspace/criteria-reload')
+  }
+  
   function saveAndStartCampaign() {
     dm4c.page_panel.save()
     startCampaign()
@@ -126,6 +130,13 @@ dm4c.add_plugin('dm4.poemspace.plugin', function () {
         label: 'Start Campaign',
         handler: saveAndStartCampaign,
         context: ['detail-panel-edit']
+      })
+    }
+    if (topic.uri === 'com.poemspace.dm4-poemspace') {
+      commands.push({
+        label: 'Reload Criteria Cache',
+        handler: reloadCriteriaCache,
+        context: ['context-menu', 'detail-panel-show']
       })
     }
     return commands
