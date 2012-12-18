@@ -1,10 +1,13 @@
 package com.poemspace.dm4;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
+import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
@@ -30,14 +33,28 @@ public class CriteriaCache {
      */
     public List<Topic> getTypes() {
         if (types == null) {
-            log.info("reveal criteria types");
             types = new ArrayList<Topic>();
+
+            log.info("reveal criteria types");
+            Map<String, Topic> typesByUri = new HashMap<String, Topic>();
             TopicType criteriaType = dms.getTopicType("dm4.poemspace.criteria.type", null);
             for (RelatedTopic type : criteriaType.getRelatedTopics("dm4.core.association", null,
                     null, null, false, false, 0, null)) {
-                types.add(type);
+                typesByUri.put(type.getUri(), type);
             }
-            Collections.sort(types, PoemSpacePlugin.VALUE_COMPARATOR);
+
+            // use order of person aggregates
+            TopicType personType = dms.getTopicType("dm4.contacts.person", null);
+            Collection<AssociationDefinition> assocDefs = personType.getAssocDefs();
+
+            for (AssociationDefinition assocDef : assocDefs) {
+                if (assocDef.getTypeUri().equals("dm4.core.aggregation_def")) {
+                    if (typesByUri.containsKey(assocDef.getPartTypeUri())) {
+                        log.info("use criteria uri " + assocDef.getPartTypeUri());
+                        types.add(typesByUri.get(assocDef.getPartTypeUri()));
+                    }
+                }
+            }
         }
         return types;
     }
