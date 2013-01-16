@@ -24,7 +24,6 @@ import javax.ws.rs.core.MediaType;
 
 import de.deepamehta.core.Association;
 import de.deepamehta.core.DeepaMehtaObject;
-import de.deepamehta.core.DeepaMehtaTransaction;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.ResultSet;
 import de.deepamehta.core.Topic;
@@ -45,6 +44,7 @@ import de.deepamehta.core.service.accesscontrol.AccessControlList;
 import de.deepamehta.core.service.accesscontrol.Operation;
 import de.deepamehta.core.service.accesscontrol.UserRole;
 import de.deepamehta.core.service.annotation.ConsumesService;
+import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
 import de.deepamehta.plugins.mail.Mail;
 import de.deepamehta.plugins.mail.RecipientType;
