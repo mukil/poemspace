@@ -10,7 +10,7 @@ The categories themself are configurable by the user.
 
 ## Requirements
 
-  * [DeepaMehta 4](http://github.com/jri/deepamehta) 4.0.14
-  * [Images Plugin](http://github.com/dgf/dm4-images) 0.0.1
-  * [Mail Plugin](http://github.com/dgf/dm4-mail) 0.0.1
+  * [DeepaMehta 4](http://github.com/jri/deepamehta) 4.1-SNAPSHOT
+  * [Images Plugin](http://github.com/dgf/dm4-images) 0.0.2-SNAPSHOT
+  * [Mail Plugin](http://github.com/dgf/dm4-mail) 0.0.2-SNAPSHOT
 
