@@ -51,6 +51,8 @@ import de.deepamehta.plugins.mail.RecipientType;
 import de.deepamehta.plugins.mail.StatusReport;
 import de.deepamehta.plugins.mail.service.MailService;
 
+import static de.deepamehta.plugins.mail.MailPlugin.*;
+
 @Path("/poemspace")
 @Produces(MediaType.APPLICATION_JSON)
 public class PoemSpacePlugin extends PluginActivator {
@@ -99,7 +101,7 @@ public class PoemSpacePlugin extends PluginActivator {
 
     @POST
     @Path("/criteria/{name}")
-    public Topic createCriteria(@PathParam("name") String name,
+    public Topic createCriteria(@PathParam("name") String name,//
             @HeaderParam("Cookie") ClientState cookie) {
         log.info("create criteria " + name);
         // TODO sanitize name parameter
@@ -127,7 +129,7 @@ public class PoemSpacePlugin extends PluginActivator {
             // create search type aggregates
             for (Topic topic : mailService.getSearchParentTypes()) {
                 TopicType searchType = dms.getTopicType(topic.getUri(), cookie);
-                searchType.addAssocDef(new AssociationDefinitionModel("dm4.core.aggregation_def",
+                searchType.addAssocDef(new AssociationDefinitionModel("dm4.core.aggregation_def",//
                         searchType.getUri(), type.getUri(), "dm4.core.one", "dm4.core.many"));
             }
 
@@ -242,13 +244,16 @@ public class PoemSpacePlugin extends PluginActivator {
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
             Topic mail = dms.getTopic(mailId, false, cookie);
-            RelatedTopic campaign = mail.getRelatedTopic("dm4.core.association",
+            RelatedTopic campaign = mail.getRelatedTopic("dm4.core.association",//
                     "dm4.core.default", "dm4.core.default", CAMPAIGN, false, false, cookie);
 
             // associate recipients of query result
             for (Topic recipient : queryCampaignRecipients(campaign)) {
-                mailService.associateRecipient(mailId,
-                        dms.getTopic(recipient.getId(), true, cookie), RecipientType.BCC, cookie);
+                Topic topic = dms.getTopic(recipient.getId(), true, cookie);
+                for (TopicModel address : topic.getCompositeValue().getTopics(EMAIL_ADDRESS)) {
+                    mailService.associateRecipient(mailId, //
+                            address.getId(), RecipientType.BCC, cookie);
+                }
             }
 
             tx.success();
@@ -404,12 +409,12 @@ public class PoemSpacePlugin extends PluginActivator {
      *            topic type URIs of possible recipients
      * @return
      */
-    private Set<Topic> getCriterionRecipients(Set<RelatedTopic> criterionList,
+    private Set<Topic> getCriterionRecipients(Set<RelatedTopic> criterionList,//
             Set<String> searchTypeUris) {
         Set<Topic> recipients = new HashSet<Topic>();
         for (Topic criterion : criterionList) {
-            for (RelatedTopic topic : dms.getTopic(criterion.getId(), false, null)
-                    .getRelatedTopics("dm4.core.aggregation", "dm4.core.part", "dm4.core.whole",
+            for (RelatedTopic topic : dms.getTopic(criterion.getId(), false, null)//
+                    .getRelatedTopics("dm4.core.aggregation", "dm4.core.part", "dm4.core.whole", //
                             null, false, false, 0, null)) {
                 if (searchTypeUris.contains(topic.getTypeUri())) {
                     recipients.add(topic);
@@ -428,7 +433,7 @@ public class PoemSpacePlugin extends PluginActivator {
     private Map<String, Set<RelatedTopic>> getCriterionMap(Topic topic) {
         Map<String, Set<RelatedTopic>> criterionMap = new HashMap<String, Set<RelatedTopic>>();
         for (String typeUri : criteria.getTypeUris()) {
-            ResultSet<RelatedTopic> relatedTopics = topic.getRelatedTopics("dm4.core.aggregation",
+            ResultSet<RelatedTopic> relatedTopics = topic.getRelatedTopics("dm4.core.aggregation",//
                     "dm4.core.whole", "dm4.core.part", typeUri, false, false, 0, null);
             if (relatedTopics.getSize() > 0) {
                 criterionMap.put(typeUri, relatedTopics.getItems());

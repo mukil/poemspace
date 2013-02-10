@@ -32,6 +32,16 @@
     })
   }
 
+  function getRecipient(childId, parentUri) {
+    return dm4c.restc.get_topic_related_topics(childId, {
+      assoc_type_uri: 'dm4.core.composition',
+      my_role_type_uri: 'dm4.core.part',
+      others_role_type_uri: 'dm4.core.whole',
+      others_topic_type_uri: parentUri
+    }).items[0]
+    return null
+  }
+
   function getRecipientsById(campaignId, type) {
     return dm4c.restc.get_topic_related_topics(campaignId, {
       assoc_type_uri: type
@@ -246,9 +256,11 @@
       dm4c.render.page($right)
       $right.append($recipients).append(dm4c.get_plugin('dm4.mail.plugin')
         .createCompletionField('Add', function include($item, item) {
-          includeRecipient(campaign.id, item.id)
+          var recipient = getRecipient(item.id, item.type_uri)
+          includeRecipient(campaign.id, recipient.id)
           refreshRecipients()
-        }))
+        })
+      )
 
       refreshRecipients()
       registerCriterionChange(campaign, $criteria, $recipients)
