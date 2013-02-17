@@ -250,9 +250,11 @@ public class PoemSpacePlugin extends PluginActivator {
             // associate recipients of query result
             for (Topic recipient : queryCampaignRecipients(campaign)) {
                 Topic topic = dms.getTopic(recipient.getId(), true, cookie);
-                for (TopicModel address : topic.getCompositeValue().getTopics(EMAIL_ADDRESS)) {
-                    mailService.associateRecipient(mailId, //
-                            address.getId(), RecipientType.BCC, cookie);
+                if (topic.getCompositeValue().has(EMAIL_ADDRESS)) {
+                    for (TopicModel address : topic.getCompositeValue().getTopics(EMAIL_ADDRESS)) {
+                        mailService.associateRecipient(mailId, //
+                                address.getId(), RecipientType.BCC, cookie);
+                    }
                 }
             }
 
