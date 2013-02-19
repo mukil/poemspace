@@ -1,5 +1,7 @@
 package com.poemspace.dm4;
 
+import static de.deepamehta.plugins.mail.MailPlugin.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,7 +34,6 @@ import de.deepamehta.core.ViewConfiguration;
 import de.deepamehta.core.model.AssociationDefinitionModel;
 import de.deepamehta.core.model.AssociationModel;
 import de.deepamehta.core.model.IndexMode;
-import de.deepamehta.core.model.SimpleValue;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
@@ -50,8 +51,6 @@ import de.deepamehta.plugins.mail.Mail;
 import de.deepamehta.plugins.mail.RecipientType;
 import de.deepamehta.plugins.mail.StatusReport;
 import de.deepamehta.plugins.mail.service.MailService;
-
-import static de.deepamehta.plugins.mail.MailPlugin.*;
 
 @Path("/poemspace")
 @Produces(MediaType.APPLICATION_JSON)
@@ -188,7 +187,7 @@ public class PoemSpacePlugin extends PluginActivator {
             Collections.sort(recipients, VALUE_COMPARATOR);
 
             // update campaign count and return result
-            campaign.setChildTopicValue(COUNT, new SimpleValue(recipients.size()));
+            campaign.getCompositeValue().set(COUNT, recipients.size(), cookie, null);
             tx.success();
             return recipients;
         } catch (Exception e) {
@@ -251,7 +250,7 @@ public class PoemSpacePlugin extends PluginActivator {
             for (Topic recipient : queryCampaignRecipients(campaign)) {
                 Topic topic = dms.getTopic(recipient.getId(), true, cookie);
                 if (topic.getCompositeValue().has(EMAIL_ADDRESS)) {
-                    for (TopicModel address : topic.getCompositeValue().getTopics(EMAIL_ADDRESS)) {
+                    for (Topic address : topic.getCompositeValue().getTopics(EMAIL_ADDRESS)) {
                         mailService.associateRecipient(mailId, //
                                 address.getId(), RecipientType.BCC, cookie);
                     }

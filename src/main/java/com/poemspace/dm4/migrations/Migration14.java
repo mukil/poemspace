@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.model.CompositeValue;
+import de.deepamehta.core.model.CompositeValueModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.Migration;
 
@@ -100,7 +100,7 @@ public class Migration14 extends Migration {
             Map<String, Long> criteria = MAP.get(criterionName);
             if (criteria != null) {
                 // map composite value
-                CompositeValue valueUpdate = new CompositeValue();
+                CompositeValueModel valueUpdate = new CompositeValueModel();
                 for (String uri : criteria.keySet()) {
                     valueUpdate.add(uri, new TopicModel(criteria.get(uri)));
                 }
