@@ -415,7 +415,7 @@ public class PoemSpacePlugin extends PluginActivator {
         Set<Topic> recipients = new HashSet<Topic>();
         for (Topic criterion : criterionList) {
             for (RelatedTopic topic : dms.getTopic(criterion.getId(), false, null)//
-                    .getRelatedTopics("dm4.core.aggregation", "dm4.core.part", "dm4.core.whole", //
+                    .getRelatedTopics("dm4.core.aggregation", "dm4.core.child", "dm4.core.parent", //
                             null, false, false, 0, null)) {
                 if (searchTypeUris.contains(topic.getTypeUri())) {
                     recipients.add(topic);
@@ -435,7 +435,7 @@ public class PoemSpacePlugin extends PluginActivator {
         Map<String, Set<RelatedTopic>> criterionMap = new HashMap<String, Set<RelatedTopic>>();
         for (String typeUri : criteria.getTypeUris()) {
             ResultSet<RelatedTopic> relatedTopics = topic.getRelatedTopics("dm4.core.aggregation",//
-                    "dm4.core.whole", "dm4.core.part", typeUri, false, false, 0, null);
+                    "dm4.core.parent", "dm4.core.child", typeUri, false, false, 0, null);
             if (relatedTopics.getSize() > 0) {
                 criterionMap.put(typeUri, relatedTopics.getItems());
             }

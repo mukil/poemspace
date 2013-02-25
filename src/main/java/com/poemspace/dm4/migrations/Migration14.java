@@ -107,7 +107,7 @@ public class Migration14 extends Migration {
 
                 // update all related contacts
                 for (RelatedTopic contact : criterion.getRelatedTopics("dm4.core.aggregation", //
-                        "dm4.core.part", "dm4.core.whole", null, false, false, 0, null)) {
+                        "dm4.core.child", "dm4.core.parent", null, false, false, 0, null)) {
                     log.info("update " + criterionName + " contact " + contact.getSimpleValue());
                     contact.setCompositeValue(valueUpdate, null, null);
                 }

@@ -49,9 +49,9 @@ public class CriteriaCache {
 
             for (AssociationDefinition assocDef : assocDefs) {
                 if (assocDef.getTypeUri().equals("dm4.core.aggregation_def")) {
-                    if (typesByUri.containsKey(assocDef.getPartTypeUri())) {
-                        log.info("use criteria uri " + assocDef.getPartTypeUri());
-                        types.add(typesByUri.get(assocDef.getPartTypeUri()));
+                    if (typesByUri.containsKey(assocDef.getChildTypeUri())) {
+                        log.info("use criteria uri " + assocDef.getChildTypeUri());
+                        types.add(typesByUri.get(assocDef.getChildTypeUri()));
                     }
                 }
             }

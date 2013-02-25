@@ -10,15 +10,15 @@
   function addCriterion(campaignId, criterionId) {
     dm4c.restc.create_association({
       type_uri: 'dm4.core.aggregation',
-      role_1: { topic_id: campaignId, role_type_uri: 'dm4.core.whole' },
-      role_2: { topic_id: criterionId, role_type_uri: 'dm4.core.part' }
+      role_1: { topic_id: campaignId, role_type_uri: 'dm4.core.parent' },
+      role_2: { topic_id: criterionId, role_type_uri: 'dm4.core.child' }
     })
   }
 
   // get and delete criterion aggregation
   function deleteCriterion(campaignId, criterionId) {
     var aggregate = dm4c.restc.get_association('dm4.core.aggregation',
-      campaignId, criterionId, 'dm4.core.whole', 'dm4.core.part')
+      campaignId, criterionId, 'dm4.core.parent', 'dm4.core.child')
     dm4c.restc.delete_association(aggregate.id)
   }
 
@@ -35,8 +35,8 @@
   function getRecipient(childId, parentUri) {
     return dm4c.restc.get_topic_related_topics(childId, {
       assoc_type_uri: 'dm4.core.composition',
-      my_role_type_uri: 'dm4.core.part',
-      others_role_type_uri: 'dm4.core.whole',
+      my_role_type_uri: 'dm4.core.child',
+      others_role_type_uri: 'dm4.core.parent',
       others_topic_type_uri: parentUri
     }).items[0]
     return null
