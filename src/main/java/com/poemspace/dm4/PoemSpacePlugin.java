@@ -39,6 +39,7 @@ import de.deepamehta.core.model.TopicRoleModel;
 import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
+import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.PluginService;
 import de.deepamehta.core.service.accesscontrol.ACLEntry;
 import de.deepamehta.core.service.accesscontrol.AccessControlList;
@@ -187,7 +188,7 @@ public class PoemSpacePlugin extends PluginActivator {
             Collections.sort(recipients, VALUE_COMPARATOR);
 
             // update campaign count and return result
-            campaign.getCompositeValue().set(COUNT, recipients.size(), cookie, null);
+            campaign.getCompositeValue().set(COUNT, recipients.size(), cookie, new Directives());
             tx.success();
             return recipients;
         } catch (Exception e) {
