@@ -1,7 +1,5 @@
 package com.poemspace.dm4;
 
-import static de.deepamehta.plugins.mail.MailPlugin.*;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -49,7 +47,6 @@ import de.deepamehta.core.service.annotation.ConsumesService;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
 import de.deepamehta.plugins.mail.Mail;
-import de.deepamehta.plugins.mail.RecipientType;
 import de.deepamehta.plugins.mail.StatusReport;
 import de.deepamehta.plugins.mail.service.MailService;
 
@@ -248,18 +245,12 @@ public class PoemSpacePlugin extends PluginActivator {
                     "dm4.core.default", "dm4.core.default", CAMPAIGN, false, false, cookie);
 
             // associate recipients of query result
-            for (Topic recipient : queryCampaignRecipients(campaign)) {
-                Topic topic = dms.getTopic(recipient.getId(), true, cookie);
-                if (topic.getCompositeValue().has(EMAIL_ADDRESS)) {
-                    for (Topic address : topic.getCompositeValue().getTopics(EMAIL_ADDRESS)) {
-                        mailService.associateRecipient(mailId, //
-                                address.getId(), RecipientType.BCC, cookie);
-                    }
-                }
-            }
+            mailService.associateValidatedRecipients(mailId, queryCampaignRecipients(campaign), cookie);
 
+            // send and report status
+            StatusReport report = mailService.send(new Mail(mailId, dms, cookie));
             tx.success();
-            return mailService.send(new Mail(mailId, dms, cookie));
+            return report;
         } catch (Exception e) {
             throw new WebApplicationException(new RuntimeException(//
                     "send campaign mail \"" + mailId + "\" failed", e));
