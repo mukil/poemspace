@@ -114,9 +114,9 @@ public class PoemSpacePlugin extends PluginActivator {
             viewConfig.addSetting("dm4.webclient.view_config",//
                     "dm4.webclient.multi_renderer_uri", "dm4.webclient.checkbox_renderer");
             viewConfig.addSetting("dm4.webclient.view_config",//
-                    "dm4.webclient.add_to_create_menu", true);
+                    "dm4.webclient.show_in_create_menu", true);
             viewConfig.addSetting("dm4.webclient.view_config",//
-                    "dm4.webclient.is_searchable_unit", true);
+                    "dm4.webclient.searchable_as_unit", true);
 
             // associate criteria type
             dms.createAssociation(new AssociationModel("dm4.core.association",//
@@ -329,7 +329,7 @@ public class PoemSpacePlugin extends PluginActivator {
             String adminName = admin.getSimpleValue().toString();
             acService.setCreator(instance.getId(), adminName);
             acService.setOwner(instance.getId(), adminName);
-            acService.createACL(instance.getId(), new AccessControlList( //
+            acService.setACL(instance.getId(), new AccessControlList( //
                     new ACLEntry(Operation.WRITE, UserRole.OWNER)));
         }
     }

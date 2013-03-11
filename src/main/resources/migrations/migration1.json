@@ -12,8 +12,8 @@
                     composite: {
                         dm4.webclient.icon: "/com.poemspace.dm4-poemspace/images/circled-dot.png",
                         dm4.webclient.multi_renderer_uri: "dm4.webclient.checkbox_renderer",
-                        dm4.webclient.add_to_create_menu: true,
-                        dm4.webclient.is_searchable_unit: true
+                        dm4.webclient.show_in_create_menu: true,
+                        dm4.webclient.searchable_as_unit: true
                     }
                 }
             ]
@@ -29,8 +29,8 @@
                     composite: {
                         dm4.webclient.icon: "/com.poemspace.dm4-poemspace/images/dot.png",
                         dm4.webclient.multi_renderer_uri: "dm4.webclient.checkbox_renderer",
-                        dm4.webclient.add_to_create_menu: true,
-                        dm4.webclient.is_searchable_unit: true
+                        dm4.webclient.show_in_create_menu: true,
+                        dm4.webclient.searchable_as_unit: true
                     }
                 }
             ]
@@ -46,8 +46,8 @@
                     composite: {
                         dm4.webclient.icon: "/com.poemspace.dm4-poemspace/images/tent.png",
                         dm4.webclient.multi_renderer_uri: "dm4.webclient.checkbox_renderer",
-                        dm4.webclient.add_to_create_menu: true,
-                        dm4.webclient.is_searchable_unit: true
+                        dm4.webclient.show_in_create_menu: true,
+                        dm4.webclient.searchable_as_unit: true
                     }
                 }
             ]
@@ -63,8 +63,8 @@
                     composite: {
                         dm4.webclient.icon: "/com.poemspace.dm4-poemspace/images/butterfly.png",
                         dm4.webclient.multi_renderer_uri: "dm4.webclient.checkbox_renderer",
-                        dm4.webclient.add_to_create_menu: true,
-                        dm4.webclient.is_searchable_unit: true
+                        dm4.webclient.show_in_create_menu: true,
+                        dm4.webclient.searchable_as_unit: true
                     }
                 }
             ]
@@ -92,8 +92,8 @@
                     type_uri: "dm4.webclient.view_config",
                     composite: {
                         dm4.webclient.icon: "/com.poemspace.dm4-poemspace/images/lists.png",
-                        dm4.webclient.add_to_create_menu: false,
-                        dm4.webclient.is_searchable_unit: true
+                        dm4.webclient.show_in_create_menu: false,
+                        dm4.webclient.searchable_as_unit: true
                     }
                 }
             ]

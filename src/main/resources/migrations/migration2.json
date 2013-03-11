@@ -41,8 +41,8 @@
                     composite: {
                         dm4.webclient.icon: "/com.poemspace.dm4-poemspace/images/mailing.png",
                         dm4.webclient.page_renderer_uri: "dm4.poemspace.campaign.renderer",
-                        dm4.webclient.add_to_create_menu: false,
-                        dm4.webclient.is_searchable_unit: true
+                        dm4.webclient.show_in_create_menu: false,
+                        dm4.webclient.searchable_as_unit: true
                     }
                 }
             ]
