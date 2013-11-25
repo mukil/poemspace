@@ -37,14 +37,14 @@ public class CriteriaCache {
 
             log.info("reveal criteria types");
             Map<String, Topic> typesByUri = new HashMap<String, Topic>();
-            TopicType criteriaType = dms.getTopicType("dm4.poemspace.criteria.type", null);
+            TopicType criteriaType = dms.getTopicType("dm4.poemspace.criteria.type");
             for (RelatedTopic type : criteriaType.getRelatedTopics("dm4.core.association", null,
-                    null, null, false, false, 0, null)) {
+                    null, null, false, false, 0)) {
                 typesByUri.put(type.getUri(), type);
             }
 
             // use order of person aggregates
-            TopicType personType = dms.getTopicType("dm4.contacts.person", null);
+            TopicType personType = dms.getTopicType("dm4.contacts.person");
             Collection<AssociationDefinition> assocDefs = personType.getAssocDefs();
 
             for (AssociationDefinition assocDef : assocDefs) {

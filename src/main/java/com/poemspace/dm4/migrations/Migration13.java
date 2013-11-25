@@ -111,7 +111,7 @@ public class Migration13 extends Migration {
             }
         });
 
-        for (Topic list : dms.getTopics(LIST, false, 0, null)) {
+        for (Topic list : dms.getTopics(LIST, false, 0)) {
             String listName = list.getSimpleValue().toString();
             log.info("reassign members of list " + listName);
             Map<String, Long> criteria = MAP.get(listName);
@@ -119,20 +119,23 @@ public class Migration13 extends Migration {
                 // map composite value
                 CompositeValueModel valueUpdate = new CompositeValueModel();
                 for (String uri : criteria.keySet()) {
-                    valueUpdate.add(uri, new TopicModel(criteria.get(uri)));
+                    valueUpdate.addRef(uri, criteria.get(uri));
                 }
 
                 // update all related contacts
-                for (String contactType : CONTACT_URIS) {
+                for (String contactTypeUri : CONTACT_URIS) {
+                    TopicModel model = new TopicModel(contactTypeUri);
+                    model.setCompositeValue(valueUpdate);
                     for (RelatedTopic contact : list.getRelatedTopics("dm4.core.association", //
-                            null, null, contactType, false, false, 0, null)) {
+                            null, null, contactTypeUri, false, false, 0)) {
                         log.info("update " + listName + " contact " + contact.getSimpleValue());
-                        contact.setCompositeValue(valueUpdate, null, null);
+                        model.setId(contact.getId());
+                        dms.updateTopic(model, null);
                     }
                 }
 
                 // delete distribution list
-                dms.deleteTopic(list.getId(), null);
+                dms.deleteTopic(list.getId());
             }
         }
     }

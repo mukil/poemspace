@@ -137,11 +137,11 @@
       $removeDiv = $('<div>').addClass('remove-button'),
       $recipient = $('<div>').append($topicDiv).append($removeDiv)
     if (type === 'exclude') {
-      $removeDiv.append(dm4c.ui.button(onRemoveExclude, undefined, 'circle-plus'))
+      $removeDiv.append(dm4c.ui.button({ on_click: onRemoveExclude, icon: 'circle-plus' }))
     } else if (type === 'include') {
-      $removeDiv.append(dm4c.ui.button(onRemoveInclude, undefined, 'circle-minus'))
+      $removeDiv.append(dm4c.ui.button({ on_click: onRemoveInclude, icon: 'circle-minus'}))
     } else { // result
-      $removeDiv.append(dm4c.ui.button(onExclude, undefined, 'circle-minus'))
+      $removeDiv.append(dm4c.ui.button({ on_click: onExclude, icon: 'circle-minus'}))
     }
     return $recipient.addClass('box').data('recipient', recipient)
   }
@@ -187,7 +187,7 @@
         $count = $('span.criterion-count', $input.parent().parent().parent()),
         criterion = $input.data('criterion')
 
-      if ($input.attr('checked')) {
+      if ($input.is(':checked')) {
         addCriterion(campaign.id, criterion.id)
         $count.text(parseInt($count.text()) + 1)
       } else {
@@ -269,7 +269,8 @@
         dm4c.do_update_topic({
           id: campaign.id,
           composite: {
-            'dm4.mail.subject': $.trim($name.val())
+            'dm4.mail.subject': $.trim($name.val()),
+            'dm4.time.modified': campaign.composite['dm4.time.modified']
           }
         })
         //dm4c.page_panel.refresh()

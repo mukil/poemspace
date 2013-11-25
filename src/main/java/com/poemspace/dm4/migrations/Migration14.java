@@ -94,7 +94,7 @@ public class Migration14 extends Migration {
             }
         });
 
-        for (Topic criterion : dms.getTopics(ART, false, 0, null)) {
+        for (Topic criterion : dms.getTopics(ART, false, 0)) {
             String criterionName = criterion.getSimpleValue().toString();
             log.info("reassign members of art criterion " + criterionName);
             Map<String, Long> criteria = MAP.get(criterionName);
@@ -102,18 +102,23 @@ public class Migration14 extends Migration {
                 // map composite value
                 CompositeValueModel valueUpdate = new CompositeValueModel();
                 for (String uri : criteria.keySet()) {
-                    valueUpdate.add(uri, new TopicModel(criteria.get(uri)));
+                    valueUpdate.addRef(uri, criteria.get(uri));
                 }
 
                 // update all related contacts
-                for (RelatedTopic contact : criterion.getRelatedTopics("dm4.core.aggregation", //
-                        "dm4.core.child", "dm4.core.parent", null, false, false, 0, null)) {
-                    log.info("update " + criterionName + " contact " + contact.getSimpleValue());
-                    contact.setCompositeValue(valueUpdate, null, null);
+                for (String contactTypeUri : CONTACT_URIS) {
+                    TopicModel model = new TopicModel(contactTypeUri);
+                    model.setCompositeValue(valueUpdate);
+                    for (RelatedTopic contact : criterion.getRelatedTopics("dm4.core.aggregation", //
+                            "dm4.core.child", "dm4.core.parent", contactTypeUri, false, false, 0)) {
+                        log.info("update " + criterionName + " contact " + contact.getSimpleValue());
+                        model.setId(contact.getId());
+                        dms.updateTopic(model, null);
+                    }
                 }
 
                 // delete distribution list
-                dms.deleteTopic(criterion.getId(), null);
+                dms.deleteTopic(criterion.getId());
             }
         }
     }

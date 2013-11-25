@@ -19,7 +19,6 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
 import de.deepamehta.core.Association;
@@ -39,12 +38,12 @@ import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.ClientState;
 import de.deepamehta.core.service.Directives;
 import de.deepamehta.core.service.PluginService;
-import de.deepamehta.core.service.accesscontrol.ACLEntry;
-import de.deepamehta.core.service.accesscontrol.AccessControlList;
-import de.deepamehta.core.service.accesscontrol.Operation;
-import de.deepamehta.core.service.accesscontrol.UserRole;
 import de.deepamehta.core.service.annotation.ConsumesService;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
+import de.deepamehta.plugins.accesscontrol.model.ACLEntry;
+import de.deepamehta.plugins.accesscontrol.model.AccessControlList;
+import de.deepamehta.plugins.accesscontrol.model.Operation;
+import de.deepamehta.plugins.accesscontrol.model.UserRole;
 import de.deepamehta.plugins.accesscontrol.service.AccessControlService;
 import de.deepamehta.plugins.mail.Mail;
 import de.deepamehta.plugins.mail.StatusReport;
@@ -82,11 +81,7 @@ public class PoemSpacePlugin extends PluginActivator {
     @GET
     @Path("/criteria-types")
     public List<Topic> getCriteriaTypes() {
-        try {
-            return criteria.getTypes();
-        } catch (Exception e) {
-            throw new WebApplicationException(e);
-        }
+        return criteria.getTypes();
     }
 
     @POST
@@ -125,7 +120,7 @@ public class PoemSpacePlugin extends PluginActivator {
 
             // create search type aggregates
             for (Topic topic : mailService.getSearchParentTypes()) {
-                TopicType searchType = dms.getTopicType(topic.getUri(), cookie);
+                TopicType searchType = dms.getTopicType(topic.getUri());
                 searchType.addAssocDef(new AssociationDefinitionModel("dm4.core.aggregation_def",//
                         searchType.getUri(), type.getUri(), "dm4.core.one", "dm4.core.many"));
             }
@@ -135,8 +130,6 @@ public class PoemSpacePlugin extends PluginActivator {
             tx.success();
 
             return type;
-        } catch (Exception e) {
-            throw new WebApplicationException(e);
         } finally {
             tx.finish();
         }
@@ -148,12 +141,8 @@ public class PoemSpacePlugin extends PluginActivator {
             @PathParam("id") long campaignId,//
             @PathParam("recipient") long recipientId,//
             @HeaderParam("Cookie") ClientState cookie) {
-        try {
-            log.info("include recipient " + recipientId + " into campaign " + campaignId);
-            return createOrUpdateRecipient(INCLUDE, campaignId, recipientId, cookie);
-        } catch (Exception e) {
-            throw new WebApplicationException(e);
-        }
+        log.info("include recipient " + recipientId + " into campaign " + campaignId);
+        return createOrUpdateRecipient(INCLUDE, campaignId, recipientId, cookie);
     }
 
     @POST
@@ -162,12 +151,8 @@ public class PoemSpacePlugin extends PluginActivator {
             @PathParam("id") long campaignId,//
             @PathParam("recipient") long recipientId,//
             @HeaderParam("Cookie") ClientState cookie) {
-        try {
-            log.info("exclude recipient " + recipientId + " from campaign " + campaignId);
-            return createOrUpdateRecipient(EXCLUDE, campaignId, recipientId, cookie);
-        } catch (Exception e) {
-            throw new WebApplicationException(e);
-        }
+        log.info("exclude recipient " + recipientId + " from campaign " + campaignId);
+        return createOrUpdateRecipient(EXCLUDE, campaignId, recipientId, cookie);
     }
 
     @GET
@@ -178,7 +163,7 @@ public class PoemSpacePlugin extends PluginActivator {
         log.info("get campaign " + campaignId + " recipients");
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            Topic campaign = dms.getTopic(campaignId, true, cookie);
+            Topic campaign = dms.getTopic(campaignId, true);
 
             // get and sort recipients
             List<Topic> recipients = queryCampaignRecipients(campaign);
@@ -189,8 +174,7 @@ public class PoemSpacePlugin extends PluginActivator {
             tx.success();
             return recipients;
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException(//
-                    "recipients query of campaign " + campaignId + " failed", e));
+            throw new RuntimeException("recipients query of campaign " + campaignId + " failed", e);
         } finally {
             tx.finish();
         }
@@ -218,8 +202,7 @@ public class PoemSpacePlugin extends PluginActivator {
             tx.success();
             return campaign;
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException(//
-                    "start a campaign from mail \"" + mailId + "\" failed", e));
+            throw new RuntimeException("start a campaign from mail " + mailId + " failed", e);
         } finally {
             tx.finish();
         }
@@ -240,20 +223,19 @@ public class PoemSpacePlugin extends PluginActivator {
         log.info("send campaign mail " + mailId);
         DeepaMehtaTransaction tx = dms.beginTx();
         try {
-            Topic mail = dms.getTopic(mailId, false, cookie);
+            Topic mail = dms.getTopic(mailId, false);
             RelatedTopic campaign = mail.getRelatedTopic("dm4.core.association",//
-                    "dm4.core.default", "dm4.core.default", CAMPAIGN, false, false, cookie);
+                    "dm4.core.default", "dm4.core.default", CAMPAIGN, false, false);
 
             // associate recipients of query result
             mailService.associateValidatedRecipients(mailId, queryCampaignRecipients(campaign), cookie);
 
             // send and report status
-            StatusReport report = mailService.send(new Mail(mailId, dms, cookie));
+            StatusReport report = mailService.send(new Mail(mailId, dms));
             tx.success();
             return report;
         } catch (Exception e) {
-            throw new WebApplicationException(new RuntimeException(//
-                    "send campaign mail \"" + mailId + "\" failed", e));
+            throw new RuntimeException("send campaign mail " + mailId + " failed", e);
         } finally {
             tx.finish();
         }
@@ -310,26 +292,20 @@ public class PoemSpacePlugin extends PluginActivator {
         }
     }
 
-    // private void checkACLsOfAssociations(String typeUri) {
-    // for (RelatedAssociation topic : dms.getAssociations(typeUri)) {
-    // checkACLsOfObject(topic);
-    // }
-    // }
-
     private void checkACLsOfTopics(String typeUri) {
-        for (RelatedTopic topic : dms.getTopics(typeUri, false, 0, null)) {
+        for (RelatedTopic topic : dms.getTopics(typeUri, false, 0)) {
             checkACLsOfObject(topic);
         }
     }
 
     private void checkACLsOfObject(DeepaMehtaObject instance) {
-        if (acService.getCreator(instance.getId()) == null) {
+        if (acService.getCreator(instance) == null) {
             log.info("initial ACL update " + instance.getId() + ": " + instance.getSimpleValue());
             Topic admin = acService.getUsername("admin");
             String adminName = admin.getSimpleValue().toString();
-            acService.setCreator(instance.getId(), adminName);
-            acService.setOwner(instance.getId(), adminName);
-            acService.setACL(instance.getId(), new AccessControlList( //
+            acService.setCreator(instance, adminName);
+            acService.setOwner(instance, adminName);
+            acService.setACL(instance, new AccessControlList( //
                     new ACLEntry(Operation.WRITE, UserRole.OWNER)));
         }
     }
@@ -366,7 +342,7 @@ public class PoemSpacePlugin extends PluginActivator {
         }
 
         // get and add includes
-        Iterator<RelatedTopic> includes = campaign.getRelatedTopics(INCLUDE, 0, null).iterator();
+        Iterator<RelatedTopic> includes = campaign.getRelatedTopics(INCLUDE, 0).iterator();
         while (includes.hasNext()) {
             RelatedTopic include = includes.next();
             if (recipients.contains(include) == false) {
@@ -375,7 +351,7 @@ public class PoemSpacePlugin extends PluginActivator {
         }
 
         // get and remove excludes
-        Iterator<RelatedTopic> excludes = campaign.getRelatedTopics(EXCLUDE, 0, null).iterator();
+        Iterator<RelatedTopic> excludes = campaign.getRelatedTopics(EXCLUDE, 0).iterator();
         while (excludes.hasNext()) {
             RelatedTopic exclude = excludes.next();
             if (recipients.contains(exclude)) {
@@ -406,9 +382,9 @@ public class PoemSpacePlugin extends PluginActivator {
             Set<String> searchTypeUris) {
         Set<Topic> recipients = new HashSet<Topic>();
         for (Topic criterion : criterionList) {
-            for (RelatedTopic topic : dms.getTopic(criterion.getId(), false, null)//
+            for (RelatedTopic topic : dms.getTopic(criterion.getId(), false)//
                     .getRelatedTopics("dm4.core.aggregation", "dm4.core.child", "dm4.core.parent", //
-                            null, false, false, 0, null)) {
+                            null, false, false, 0)) {
                 if (searchTypeUris.contains(topic.getTypeUri())) {
                     recipients.add(topic);
                 }
@@ -427,7 +403,7 @@ public class PoemSpacePlugin extends PluginActivator {
         Map<String, Set<RelatedTopic>> criterionMap = new HashMap<String, Set<RelatedTopic>>();
         for (String typeUri : criteria.getTypeUris()) {
             ResultSet<RelatedTopic> relatedTopics = topic.getRelatedTopics("dm4.core.aggregation",//
-                    "dm4.core.parent", "dm4.core.child", typeUri, false, false, 0, null);
+                    "dm4.core.parent", "dm4.core.child", typeUri, false, false, 0);
             if (relatedTopics.getSize() > 0) {
                 criterionMap.put(typeUri, relatedTopics.getItems());
             }

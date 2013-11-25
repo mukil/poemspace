@@ -27,13 +27,13 @@ public class MigrationUtils {
     public static String[] CONTACT_URIS = { "dm4.contacts.person", "dm4.contacts.institution" };
 
     public static void changeIcon(DeepaMehtaService dms, String typeUri, String iconPath) {
-        dms.getTopicType(typeUri, null).getViewConfig()
+        dms.getTopicType(typeUri).getViewConfig()
                 .addSetting("dm4.webclient.view_config", "dm4.webclient.icon", iconPath);
     }
 
     public static void addCriteriaAssocDefs(DeepaMehtaService dms, String typeUri,
             String... criteriaTypeUris) {
-        TopicType topicType = dms.getTopicType(typeUri, null);
+        TopicType topicType = dms.getTopicType(typeUri);
         for (String uri : criteriaTypeUris) {
             topicType.addAssocDef(new AssociationDefinitionModel("dm4.core.aggregation_def",//
                     typeUri, uri, "dm4.core.one", "dm4.core.many"));
@@ -42,7 +42,7 @@ public class MigrationUtils {
 
     public static Map<String, Long> getIdsByValue(DeepaMehtaService dms, String typeUri) {
         HashMap<String, Long> map = new HashMap<String, Long>();
-        for (RelatedTopic topic : dms.getTopics(typeUri, false, 0, null).getItems()) {
+        for (RelatedTopic topic : dms.getTopics(typeUri, false, 0).getItems()) {
             map.put(topic.getSimpleValue().toString(), topic.getId());
         }
         return map;
