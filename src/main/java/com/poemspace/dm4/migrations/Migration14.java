@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.model.CompositeValueModel;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.Migration;
 
@@ -94,26 +94,25 @@ public class Migration14 extends Migration {
             }
         });
 
-        for (Topic criterion : dms.getTopics(ART, false, 0)) {
+        for (Topic criterion : dms.getTopics(ART, 0)) {
             String criterionName = criterion.getSimpleValue().toString();
-            log.info("reassign members of art criterion " + criterionName);
+            log.info("Reassign Members of Art criterion " + criterionName);
             Map<String, Long> criteria = MAP.get(criterionName);
             if (criteria != null) {
                 // map composite value
-                CompositeValueModel valueUpdate = new CompositeValueModel();
+                ChildTopicsModel valueUpdate = new ChildTopicsModel();
                 for (String uri : criteria.keySet()) {
                     valueUpdate.addRef(uri, criteria.get(uri));
                 }
-
                 // update all related contacts
                 for (String contactTypeUri : CONTACT_URIS) {
                     TopicModel model = new TopicModel(contactTypeUri);
-                    model.setCompositeValue(valueUpdate);
-                    for (RelatedTopic contact : criterion.getRelatedTopics("dm4.core.aggregation", //
-                            "dm4.core.child", "dm4.core.parent", contactTypeUri, false, false, 0)) {
-                        log.info("update " + criterionName + " contact " + contact.getSimpleValue());
+                    model.setChildTopicsModel(valueUpdate);
+                    for (RelatedTopic contact : criterion.getRelatedTopics("dm4.core.aggregation",
+                            "dm4.core.child", "dm4.core.parent", contactTypeUri, 0)) {
+                        log.info("Update " + criterionName + " Contact " + contact.getSimpleValue());
                         model.setId(contact.getId());
-                        dms.updateTopic(model, null);
+                        dms.updateTopic(model);
                     }
                 }
 

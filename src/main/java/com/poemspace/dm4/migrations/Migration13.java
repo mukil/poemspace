@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
-import de.deepamehta.core.model.CompositeValueModel;
+import de.deepamehta.core.model.ChildTopicsModel;
 import de.deepamehta.core.model.TopicModel;
 import de.deepamehta.core.service.Migration;
 
@@ -111,29 +111,27 @@ public class Migration13 extends Migration {
             }
         });
 
-        for (Topic list : dms.getTopics(LIST, false, 0)) {
+        for (Topic list : dms.getTopics(LIST, 0)) {
             String listName = list.getSimpleValue().toString();
-            log.info("reassign members of list " + listName);
+            log.info("Reassign members of list " + listName);
             Map<String, Long> criteria = MAP.get(listName);
             if (criteria != null) {
                 // map composite value
-                CompositeValueModel valueUpdate = new CompositeValueModel();
+                ChildTopicsModel valueUpdate = new ChildTopicsModel();
                 for (String uri : criteria.keySet()) {
                     valueUpdate.addRef(uri, criteria.get(uri));
                 }
-
                 // update all related contacts
                 for (String contactTypeUri : CONTACT_URIS) {
                     TopicModel model = new TopicModel(contactTypeUri);
-                    model.setCompositeValue(valueUpdate);
-                    for (RelatedTopic contact : list.getRelatedTopics("dm4.core.association", //
-                            null, null, contactTypeUri, false, false, 0)) {
-                        log.info("update " + listName + " contact " + contact.getSimpleValue());
+                    model.setChildTopicsModel(valueUpdate);
+                    for (RelatedTopic contact : list.getRelatedTopics("dm4.core.association",
+                            null, null, contactTypeUri, 0)) {
+                        log.info("Update " + listName + " Contact " + contact.getSimpleValue());
                         model.setId(contact.getId());
-                        dms.updateTopic(model, null);
+                        dms.updateTopic(model);
                     }
                 }
-
                 // delete distribution list
                 dms.deleteTopic(list.getId());
             }

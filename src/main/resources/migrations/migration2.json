@@ -8,7 +8,7 @@
             view_config_topics: [
                 {
                     type_uri: "dm4.webclient.view_config",
-                    composite: {
+                    childs: {
                         dm4.webclient.icon: "/com.poemspace.dm4-poemspace/images/criteria.png",
                     }
                 }
@@ -38,7 +38,7 @@
             view_config_topics: [
                 {
                     type_uri: "dm4.webclient.view_config",
-                    composite: {
+                    childs: {
                         dm4.webclient.icon: "/com.poemspace.dm4-poemspace/images/mailing.png",
                         dm4.webclient.page_renderer_uri: "dm4.poemspace.campaign.renderer",
                         dm4.webclient.show_in_create_menu: false,

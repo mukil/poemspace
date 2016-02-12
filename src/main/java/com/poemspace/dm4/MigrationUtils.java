@@ -10,21 +10,15 @@ import de.deepamehta.core.service.DeepaMehtaService;
 
 public class MigrationUtils {
 
-    public static final String AFFILIATION = "dm4.poemspace.affiliation";
+    public static final String AFFILIATION  = "dm4.poemspace.affiliation";
+    public static final String ART          = "dm4.poemspace.art";
+    public static final String LIST         = "dm4.poemspace.list";
+    public static final String PRESS        = "dm4.poemspace.press";
+    public static final String PROJECT      = "dm4.poemspace.project";
+    public static final String PUBLIC       = "dm4.poemspace.public";
+    public static final String YEAR         = "dm4.poemspace.year";
 
-    public static final String ART = "dm4.poemspace.art";
-
-    public static final String LIST = "dm4.poemspace.list";
-
-    public static final String PRESS = "dm4.poemspace.press";
-
-    public static final String PROJECT = "dm4.poemspace.project";
-
-    public static final String PUBLIC = "dm4.poemspace.public";
-
-    public static final String YEAR = "dm4.poemspace.year";
-
-    public static String[] CONTACT_URIS = { "dm4.contacts.person", "dm4.contacts.institution" };
+    public static String[] CONTACT_URIS     = { "dm4.contacts.person", "dm4.contacts.institution" };
 
     public static void changeIcon(DeepaMehtaService dms, String typeUri, String iconPath) {
         dms.getTopicType(typeUri).getViewConfig()
@@ -42,7 +36,7 @@ public class MigrationUtils {
 
     public static Map<String, Long> getIdsByValue(DeepaMehtaService dms, String typeUri) {
         HashMap<String, Long> map = new HashMap<String, Long>();
-        for (RelatedTopic topic : dms.getTopics(typeUri, false, 0).getItems()) {
+        for (RelatedTopic topic : dms.getTopics(typeUri, 0).getItems()) {
             map.put(topic.getSimpleValue().toString(), topic.getId());
         }
         return map;

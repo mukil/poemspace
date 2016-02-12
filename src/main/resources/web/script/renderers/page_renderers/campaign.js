@@ -200,7 +200,7 @@
 
   function getAggregates(topic, type) {
     var aggregates = {}
-    $.each(topic.composite[type.uri] || [], function (t, aggregate) {
+    $.each(topic.childs[type.uri] || [], function (t, aggregate) {
       if (aggregate.id !== -1)
         aggregates[aggregate.id] = aggregate
     })
@@ -224,7 +224,7 @@
   dm4c.add_page_renderer('dm4.poemspace.campaign.renderer', {
 
     render_page: function (campaign) {
-      var subject = campaign.composite['dm4.mail.subject']
+      var subject = campaign.childs['dm4.mail.subject']
       if (subject) {
         dm4c.render.field_label('Name')
         dm4c.render.page(subject.value)
@@ -233,7 +233,7 @@
     },
 
     render_form: function (campaign) {
-      var name = campaign.composite['dm4.mail.subject'],
+      var name = campaign.childs['dm4.mail.subject'],
         $name = dm4c.render.input(name),
         $left = $('<div>').css({ float: 'left', width: '49%' }),
         $right = $('<div>').css({ float: 'right', width: '49%' }),
@@ -268,9 +268,9 @@
       return function () {
         dm4c.do_update_topic({
           id: campaign.id,
-          composite: {
+          childs: {
             'dm4.mail.subject': $.trim($name.val()),
-            'dm4.time.modified': campaign.composite['dm4.time.modified']
+            'dm4.time.modified': campaign.childs['dm4.time.modified']
           }
         })
         //dm4c.page_panel.refresh()

@@ -9,7 +9,7 @@
             view_config_topics: [
                 {
                     type_uri: "dm4.webclient.view_config",
-                    composite: {
+                    childs: {
                         dm4.webclient.icon: "/com.poemspace.dm4-poemspace/images/calendar.png",
                         dm4.webclient.multi_renderer_uri: "dm4.webclient.checkbox_renderer",
                         dm4.webclient.show_in_create_menu: true,

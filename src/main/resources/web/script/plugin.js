@@ -13,7 +13,7 @@ dm4c.add_plugin('dm4.poemspace.plugin', function () {
 
   function getCampaignRecipientCount(campaignId) {
     var campaign = dm4c.restc.get_topic_by_id(campaignId, true),
-      count = campaign.composite['dm4.poemspace.campaign.count']
+      count = campaign.childs['dm4.poemspace.campaign.count']
     if (count) {
       return count.value || 0
     } else {
@@ -51,7 +51,7 @@ dm4c.add_plugin('dm4.poemspace.plugin', function () {
   }
 
   function startCampaign() {
-    var sentDate = dm4c.selected_object.composite['dm4.mail.date']
+    var sentDate = dm4c.selected_object.childs['dm4.mail.date']
     // copy mail if send before or a recipient is associated
     if ((sentDate && $.isEmptyObject(sentDate.value) === false) // send?
       || getMailRecipients(dm4c.selected_object.id).total_count > 0) { // associated recipients?
@@ -115,7 +115,7 @@ dm4c.add_plugin('dm4.poemspace.plugin', function () {
 
   // configure menu and type commands
   dm4c.add_listener('topic_commands', function (topic) {
-    if (!dm4c.has_create_permission('dm4.poemspace.campaign')) {
+    if (!dm4c.has_create_permission_for_topic_type('dm4.poemspace.campaign')) {
       return
     }
     var commands = []
@@ -148,7 +148,7 @@ dm4c.add_plugin('dm4.poemspace.plugin', function () {
   dm4c.add_listener('show_mail', showCampaignMail)
 
   dm4c.add_listener('post_refresh_create_menu', function (menu) {
-    if (!dm4c.has_create_permission('dm4.poemspace.campaign')) {
+    if (!dm4c.has_create_permission_for_topic_type('dm4.poemspace.campaign')) {
       return
     }
     menu.add_separator()
