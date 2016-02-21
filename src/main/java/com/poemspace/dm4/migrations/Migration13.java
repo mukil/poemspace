@@ -21,100 +21,83 @@ public class Migration13 extends Migration {
     public void run() {
 
         // get criteria topics
-        final Map<String, Long> projects = getIdsByValue(dms, PROJECT);
-        final Map<String, Long> years = getIdsByValue(dms, YEAR);
-        final Map<String, Long> affiliations = getIdsByValue(dms, AFFILIATION);
-        final Map<String, Long> publics = getIdsByValue(dms, PUBLIC);
+        final Map<String, Long> art = getIdsByValue(dms, ART);
+        final Map<String, Long> press = getIdsByValue(dms, PRESS);
 
         // define mapping
         Map<String, Map<String, Long>> MAP = new HashMap<String, Map<String, Long>>();
-        MAP.put("Mitstreiter10", new HashMap<String, Long>() {
+        MAP.put("Jugendclub", new HashMap<String, Long>() {
             {
-                put(PROJECT, projects.get("Poesiefrühling"));
-                put(YEAR, years.get("2010"));
-                put(AFFILIATION, affiliations.get("Mitstreiter"));
+                put(ART, art.get("Kinder- und Jugendeinrichtung"));
             }
         });
-        MAP.put("Mitstreiter11", new HashMap<String, Long>() {
+        MAP.put("Kinderclub", new HashMap<String, Long>() {
             {
-                put(PROJECT, projects.get("Poesiefrühling"));
-                put(YEAR, years.get("2011"));
-                put(AFFILIATION, affiliations.get("Mitstreiter"));
+                put(ART, art.get("Kinder- und Jugendeinrichtung"));
             }
         });
-        MAP.put("Mitstreiter 12", new HashMap<String, Long>() {
+        MAP.put("Café", new HashMap<String, Long>() {
             {
-                put(PROJECT, projects.get("Poesiefrühling"));
-                put(YEAR, years.get("2012"));
-                put(AFFILIATION, affiliations.get("Mitstreiter"));
+                put(ART, art.get("Café/Restaurant"));
             }
         });
-        MAP.put("Printemps des Poètes Berlin09", new HashMap<String, Long>() {
+        MAP.put("Restaurant", new HashMap<String, Long>() {
             {
-                put(PROJECT, projects.get("Poesiefrühling"));
-                put(YEAR, years.get("2009"));
-            }
-        });
-        MAP.put("Printemps des Poètes, Berlin10", new HashMap<String, Long>() {
-            {
-                put(PROJECT, projects.get("Poesiefrühling"));
-                put(YEAR, years.get("2010"));
-            }
-        });
-        MAP.put("Poesiefrühling-2011", new HashMap<String, Long>() {
-            {
-                put(PROJECT, projects.get("Poesiefrühling"));
-                put(YEAR, years.get("2011"));
-            }
-        });
-        MAP.put("Poesiefrühling 2012", new HashMap<String, Long>() {
-            {
-                put(PROJECT, projects.get("Poesiefrühling"));
-                put(YEAR, years.get("2012"));
+                put(ART, art.get("Café/Restaurant"));
             }
         });
 
-        MAP.put("MeisterInnen12", new HashMap<String, Long>() {
+        MAP.put("Radio", new HashMap<String, Long>() {
             {
-                put(PROJECT, projects.get("Meister"));
-                put(YEAR, years.get("2012"));
+                put(PRESS, press.get("Radio"));
             }
         });
-        MAP.put("MeisterInnen13", new HashMap<String, Long>() {
+        MAP.put("Radio regional", new HashMap<String, Long>() {
             {
-                put(PROJECT, projects.get("Meister"));
-                put(YEAR, years.get("2013"));
+                put(PRESS, press.get("Radio"));
+                put(PRESS, press.get("regional"));
             }
         });
-
-        MAP.put("wortwedding", new HashMap<String, Long>() {
+        MAP.put("Radio Überregional", new HashMap<String, Long>() {
             {
-                put(PROJECT, projects.get("wortwedding"));
-                put(AFFILIATION, affiliations.get("Publikum"));
-            }
-        });
-
-        MAP.put("Poem Space Mobil", new HashMap<String, Long>() {
-            {
-                put(PROJECT, projects.get("Poem Space Mobil"));
+                put(PRESS, press.get("Radio"));
+                put(PRESS, press.get("überregional"));
             }
         });
 
-        MAP.put("Stiftungen", new HashMap<String, Long>() {
+        MAP.put("Zeitschrift", new HashMap<String, Long>() {
             {
-                put(AFFILIATION, affiliations.get("Förderer"));
+                put(PRESS, press.get("Print"));
             }
         });
-        MAP.put("Blogs", new HashMap<String, Long>() {
+        MAP.put("regionale Printmedien", new HashMap<String, Long>() {
             {
-                put(PUBLIC, publics.get("Webseite"));
+                put(PRESS, press.get("Print"));
+                put(PRESS, press.get("regional"));
+            }
+        });
+        MAP.put("Überregionale Print", new HashMap<String, Long>() {
+            {
+                put(PRESS, press.get("Print"));
+                put(PRESS, press.get("überregional"));
             }
         });
 
-        for (Topic list : dms.getTopics(LIST, 0)) {
-            String listName = list.getSimpleValue().toString();
-            log.info("Reassign members of list " + listName);
-            Map<String, Long> criteria = MAP.get(listName);
+        MAP.put("TV", new HashMap<String, Long>() {
+            {
+                put(PRESS, press.get("Fernsehen"));
+            }
+        });
+        MAP.put("Websites", new HashMap<String, Long>() {
+            {
+                put(PRESS, press.get("Web"));
+            }
+        });
+
+        for (Topic criterion : dms.getTopics(ART, 0)) {
+            String criterionName = criterion.getSimpleValue().toString();
+            log.info("Reassign Members of Art criterion " + criterionName);
+            Map<String, Long> criteria = MAP.get(criterionName);
             if (criteria != null) {
                 // map composite value
                 ChildTopicsModel valueUpdate = new ChildTopicsModel();
@@ -125,16 +108,18 @@ public class Migration13 extends Migration {
                 for (String contactTypeUri : CONTACT_URIS) {
                     TopicModel model = new TopicModel(contactTypeUri);
                     model.setChildTopicsModel(valueUpdate);
-                    for (RelatedTopic contact : list.getRelatedTopics("dm4.core.association",
-                            null, null, contactTypeUri, 0)) {
-                        log.info("Update " + listName + " Contact " + contact.getSimpleValue());
+                    for (RelatedTopic contact : criterion.getRelatedTopics("dm4.core.aggregation",
+                            "dm4.core.child", "dm4.core.parent", contactTypeUri, 0)) {
+                        log.info("Update " + criterionName + " Contact " + contact.getSimpleValue());
                         model.setId(contact.getId());
                         dms.updateTopic(model);
                     }
                 }
+
                 // delete distribution list
-                dms.deleteTopic(list.getId());
+                dms.deleteTopic(criterion.getId());
             }
         }
     }
+
 }

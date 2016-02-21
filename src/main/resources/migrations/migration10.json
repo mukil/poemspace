@@ -1,13 +1,20 @@
-# new art criteria instances
 {
-   topics: [
-        { # Café, Restaurant
-            type_uri: "dm4.poemspace.art",
-            value: "Café/Restaurant"
+   "topics": [
+        {
+            "type_uri": "dm4.poemspace.art",
+            "value": "Café/Restaurant"
         },
-        { # Jugendclub, Kinderclub
-            type_uri: "dm4.poemspace.art",
-            value: "Kinder- und Jugendeinrichtung"
+        {
+            "type_uri": "dm4.poemspace.art",
+            "value": "Kinder- und Jugendeinrichtung"
+        },
+        {
+            "type_uri": "dm4.poemspace.gattung",
+            "value": "Schauspiel"
+        },
+        {
+            "type_uri": "dm4.poemspace.gattung",
+            "value": "Tanz"
         }
     ]
 }

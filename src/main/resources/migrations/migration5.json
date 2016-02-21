@@ -60,6 +60,14 @@
         {
             type_uri: "dm4.poemspace.year",
             value: "2015"
+        },
+        {
+            type_uri: "dm4.poemspace.year",
+            value: "2016"
+        },
+        {
+            type_uri: "dm4.poemspace.year",
+            value: "2017"
         }
     ]
 }
