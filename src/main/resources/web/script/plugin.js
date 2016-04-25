@@ -6,8 +6,7 @@ dm4c.add_plugin('dm4.poemspace.plugin', function () {
         return dm4c.restc.request('GET', '/poemspace/criteria-types')
     }
 
-    this.getCampaignRecipients = function (campaignId) {
-        console.log("Get Campaign Recipients..")
+    this.getCampaignRecipients = function (campaignId) { // modifies timestamp of campaign topic
         var uri = '/poemspace/campaign/' + campaignId + '/recipients'
         return dm4c.restc.request('GET', uri)
     }
@@ -57,7 +56,7 @@ dm4c.add_plugin('dm4.poemspace.plugin', function () {
         if ((sentDate && $.isEmptyObject(sentDate.value) === false) // send?
                 || getMailRecipients(dm4c.selected_object.id).total_count > 0) { // associated recipients?
             var uri = '/mail/' + dm4c.selected_object.id + '/copy?recipients=false',
-                    mail = dm4c.restc.request('POST', uri)
+                mail = dm4c.restc.request('POST', uri)
             dm4c.show_topic(new Topic(mail), 'show')
         }
         var campaign = dm4c.restc.request('PUT', '/poemspace/mail/' + dm4c.selected_object.id + '/start')
@@ -100,7 +99,6 @@ dm4c.add_plugin('dm4.poemspace.plugin', function () {
             dm4c.show_topic(new Topic(criteria), 'edit')
         })
     }
-
 
     function renderMailRecipients() {
         var campaigns = getCampaignsOfMail(dm4c.selected_object.id)

@@ -35,7 +35,7 @@ public class CriteriaCache {
         if (types == null) {
             types = new ArrayList<Topic>();
 
-            log.info("reveal criteria types");
+            log.info("Loading Poemspace Criteria Types");
             Map<String, Topic> typesByUri = new HashMap<String, Topic>();
             TopicType criteriaType = dms.getTopicType("dm4.poemspace.criteria.type");
             for (RelatedTopic type : criteriaType.getRelatedTopics("dm4.core.association", null, null, null, 0)) {
@@ -49,7 +49,7 @@ public class CriteriaCache {
             for (AssociationDefinition assocDef : assocDefs) {
                 if (assocDef.getTypeUri().equals("dm4.core.aggregation_def")) {
                     if (typesByUri.containsKey(assocDef.getChildTypeUri())) {
-                        log.info("use criteria uri " + assocDef.getChildTypeUri());
+                        log.fine("Loaded criteria with uri=" + assocDef.getChildTypeUri());
                         types.add(typesByUri.get(assocDef.getChildTypeUri()));
                     }
                 }
@@ -65,7 +65,6 @@ public class CriteriaCache {
      */
     public List<String> getTypeUris() {
         if (typeUris == null) {
-            log.info("reveal criteria type URIs");
             typeUris = new ArrayList<String>();
             for (Topic type : getTypes()) {
                 typeUris.add(type.getUri());

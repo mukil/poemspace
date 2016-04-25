@@ -41,7 +41,6 @@ function getRecipient(childId, parentUri) {
 }
 
 function getRecipientsById(campaignId, type) {
-    console.log("Fetching Related Recipient Topics")
     return dm4c.restc.get_topic_related_topics(campaignId, {
         assoc_type_uri: type
     }, null, null).items
@@ -125,7 +124,6 @@ function onRemoveExclude() {
 }
 
 function createRecipient(recipient, type) {
-    console.log("Create Recipent called..")
     function click() {
         dm4c.do_reveal_related_topic(recipient.id, 'show')
     }
@@ -155,7 +153,6 @@ function mapById(topics) {
 }
 
 function refreshRecipients() {
-    console.log("Refresh Recipients called..")
     var campaignId = dm4c.selected_object.id,
         recipients = dm4c.get_plugin('dm4.poemspace.plugin').getCampaignRecipients(campaignId),
         $recipients = $('#campaign' + campaignId + 'recipients').empty(),
@@ -182,7 +179,6 @@ function refreshRecipients() {
 }
 
 function registerCriterionChange(campaign, $parent, $recipients) {
-    console.log("Registering Criterion Change")
     $parent.on('change', 'input[type="checkbox"]', function () {
         var $input = $(this),
             $count = $('span.criterion-count', $input.parent().parent().parent()),

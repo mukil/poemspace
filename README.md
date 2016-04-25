@@ -12,6 +12,8 @@ The categories themself are configurable by the user.
   * [Images Plugin](http://github.com/dgf/dm4-images) 0.9.1-SNAPSHOT
   * [Mail Plugin](http://github.com/dgf/dm4-mail) 0.2-SNAPSHOT
 
+Note: The 0.2 release for DeepaMehta 4.7 just works when the DeepaMehta 4 Caching bundle is de-activated or de-installed.
+
 ## Usage
 
 ![mail campaign map](https://github.com/dgf/poemspace/raw/master/screenshot.png)
@@ -39,4 +41,13 @@ After each criteria modification, the cache and webclient must be reloaded.
 So you have to reveal the *Poem Space* plugin to
 call the *Reload Criteria Cache* command and in addition your have to
 reload the webclient page in the web browser.
+
+### changelog
+
+**0.2**, Apr 25, 2016
+
+- Upgraded to be compatible with DeepaMehta 4.7
+- Fixes: Sending campaign mail works before criterias where edited
+
+Note: This (0.2) release for DeepaMehta 4.7 _works only_ fine when you have either de-activated ot de-installed the DeepaMehta 4 Caching plugin due to the yet unresolved [Issue #1](https://github.com/mukil/poemspace/issues/1).
 

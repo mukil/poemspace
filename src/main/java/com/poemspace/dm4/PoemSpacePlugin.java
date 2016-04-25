@@ -85,7 +85,7 @@ public class PoemSpacePlugin extends PluginActivator {
     @POST
     @Path("/criteria/{name}")
     public Topic createCriteria(@PathParam("name") String name) {
-        log.info("Ceate criteria " + name);
+        log.info("Create criteria " + name);
         // TODO sanitize name parameter
         String uri = "dm4.poemspace.criteria." + name.trim().toLowerCase();
 
@@ -140,22 +140,19 @@ public class PoemSpacePlugin extends PluginActivator {
 
     @GET
     @Path("/campaign/{id}/recipients")
+    // ### fixme: @Transactional
     public List<Topic> queryCampaignRecipients(@PathParam("id") long campaignId) {
-        log.info("Get Campaign " + campaignId + " Recipients");
-        DeepaMehtaTransaction tx = dms.beginTx();
+        log.info("Fetching Recipients of Campaign (Topic ID:" + campaignId + ")");
         try {
             Topic campaign = dms.getTopic(campaignId);
             // get and sort recipients
             List<Topic> recipients = queryCampaignRecipients(campaign);
             Collections.sort(recipients, VALUE_COMPARATOR);
             // update campaign count and return result
-            campaign.getChildTopics().set(COUNT, recipients.size());
-            tx.success();
+            // campaign.getChildTopics().set(COUNT, recipients.size());
             return recipients;
         } catch (Exception e) {
             throw new RuntimeException("recipients query of campaign " + campaignId + " FAILED", e);
-        } finally {
-            tx.finish();
         }
     }
 
