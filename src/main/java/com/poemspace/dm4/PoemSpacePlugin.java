@@ -62,6 +62,12 @@ public class PoemSpacePlugin extends PluginActivator {
         }
     };
 
+    @Override
+    public void init() {
+        log.info("Initially populating criteria cache necessary for sending poemspace mail campaigns");
+        reloadCriteriaCache();
+    }
+
     @GET
     @Path("/criteria-types")
     public List<Topic> getCriteriaTypes() {
