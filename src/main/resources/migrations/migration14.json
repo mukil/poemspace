@@ -1,0 +1,28 @@
+{
+   "topics": [
+        {
+            "type_uri": "dm4.poemspace.year",
+            "value": "2013"
+        },
+        {
+            "type_uri": "dm4.poemspace.year",
+            "value": "2014"
+        },
+        {
+            "type_uri": "dm4.poemspace.year",
+            "value": "2015"
+        },
+        {
+            "type_uri": "dm4.poemspace.year",
+            "value": "2016"
+        },
+        {
+            "type_uri": "dm4.poemspace.year",
+            "value": "2017"
+        },
+        {
+            "type_uri": "dm4.poemspace.project",
+            "value": "Poemspace Mailer"
+        }
+    ]
+}

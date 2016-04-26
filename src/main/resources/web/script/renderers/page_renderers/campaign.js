@@ -176,6 +176,10 @@ function refreshRecipients() {
             $recipients.append(createRecipient(recipient, 'result'))
         }
     })
+    // update timestamp of dm4c.selected_object to not run into trouble with the dm4-caching module
+    var modifiedCampaignTopic = dm4c.restc.get_topic_by_id(campaignId)
+    console.log("Updating Modification Timestamp of Selected Campaign Topic", modifiedCampaignTopic.childs["dm4.time.modified"].value)
+    dm4c.selected_object.childs["dm4.time.modified"].value = modifiedCampaignTopic.childs["dm4.time.modified"].value
 }
 
 function registerCriterionChange(campaign, $parent, $recipients) {

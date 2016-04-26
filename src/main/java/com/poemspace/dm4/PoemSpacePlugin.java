@@ -33,6 +33,7 @@ import de.deepamehta.core.model.TopicTypeModel;
 import de.deepamehta.core.osgi.PluginActivator;
 import de.deepamehta.core.service.Inject;
 import de.deepamehta.core.service.ResultList;
+import de.deepamehta.core.service.Transactional;
 import de.deepamehta.core.storage.spi.DeepaMehtaTransaction;
 import de.deepamehta.plugins.accesscontrol.AccessControlService;
 import de.deepamehta.plugins.mail.Mail;
@@ -84,44 +85,33 @@ public class PoemSpacePlugin extends PluginActivator {
 
     @POST
     @Path("/criteria/{name}")
+    @Transactional
     public Topic createCriteria(@PathParam("name") String name) {
-        log.info("Create criteria " + name);
+        log.info("Create new Poemspace Criteria \"" + name + "\"");
         // TODO sanitize name parameter
         String uri = "dm4.poemspace.criteria." + name.trim().toLowerCase();
-
-        DeepaMehtaTransaction tx = dms.beginTx();
-        try {
-            TopicType type = dms.createTopicType(new TopicTypeModel(uri, name, "dm4.core.text"));
-            type.addIndexMode(IndexMode.FULLTEXT);
-
-            ViewConfiguration viewConfig = type.getViewConfig();
-            viewConfig.addSetting("dm4.webclient.view_config",//
-                    "dm4.webclient.multi_renderer_uri", "dm4.webclient.checkbox_renderer");
-            viewConfig.addSetting("dm4.webclient.view_config",//
-                    "dm4.webclient.show_in_create_menu", true);
-            viewConfig.addSetting("dm4.webclient.view_config",//
-                    "dm4.webclient.searchable_as_unit", true);
-
-            // associate criteria type
-            dms.createAssociation(new AssociationModel("dm4.core.association",
-                    new TopicRoleModel("dm4.poemspace.criteria.type", "dm4.core.default"),
-                    new TopicRoleModel(type.getId(), "dm4.core.default")));
-
-            // create search type aggregates
-            for (Topic topic : mailService.getSearchParentTypes()) {
-                TopicType searchType = dms.getTopicType(topic.getUri());
-                searchType.addAssocDef(new AssociationDefinitionModel("dm4.core.aggregation_def",
-                        searchType.getUri(), type.getUri(), "dm4.core.one", "dm4.core.many"));
-            }
-
-            // renew cache
-            criteria = new CriteriaCache(dms);
-            tx.success();
-
-            return type;
-        } finally {
-            tx.finish();
+        TopicType type = dms.createTopicType(new TopicTypeModel(uri, name, "dm4.core.text"));
+        type.addIndexMode(IndexMode.FULLTEXT);
+        ViewConfiguration viewConfig = type.getViewConfig();
+        viewConfig.addSetting("dm4.webclient.view_config",//
+                "dm4.webclient.multi_renderer_uri", "dm4.webclient.checkbox_renderer");
+        viewConfig.addSetting("dm4.webclient.view_config",//
+                "dm4.webclient.show_in_create_menu", true);
+        viewConfig.addSetting("dm4.webclient.view_config",//
+                "dm4.webclient.searchable_as_unit", true);
+        // associate criteria type
+        dms.createAssociation(new AssociationModel("dm4.core.association",
+                new TopicRoleModel("dm4.poemspace.criteria.type", "dm4.core.default"),
+                new TopicRoleModel(type.getId(), "dm4.core.default")));
+        // create search type aggregates
+        for (Topic topic : mailService.getSearchParentTypes()) {
+            TopicType searchType = dms.getTopicType(topic.getUri());
+            searchType.addAssocDef(new AssociationDefinitionModel("dm4.core.aggregation_def",
+                    searchType.getUri(), type.getUri(), "dm4.core.one", "dm4.core.many"));
         }
+        // renew cache
+        criteria = new CriteriaCache(dms);
+        return type;
     }
 
     @POST
@@ -140,7 +130,7 @@ public class PoemSpacePlugin extends PluginActivator {
 
     @GET
     @Path("/campaign/{id}/recipients")
-    // ### fixme: @Transactional
+    @Transactional
     public List<Topic> queryCampaignRecipients(@PathParam("id") long campaignId) {
         log.info("Fetching Recipients of Campaign (Topic ID:" + campaignId + ")");
         try {
@@ -149,7 +139,7 @@ public class PoemSpacePlugin extends PluginActivator {
             List<Topic> recipients = queryCampaignRecipients(campaign);
             Collections.sort(recipients, VALUE_COMPARATOR);
             // update campaign count and return result
-            // campaign.getChildTopics().set(COUNT, recipients.size());
+            campaign.getChildTopics().set(COUNT, recipients.size());
             return recipients;
         } catch (Exception e) {
             throw new RuntimeException("recipients query of campaign " + campaignId + " FAILED", e);
@@ -164,20 +154,17 @@ public class PoemSpacePlugin extends PluginActivator {
      */
     @PUT
     @Path("/mail/{id}/start")
+    @Transactional
     public Topic startCampaign(@PathParam("id") long mailId) {
         log.info("Start a campaign from mail " + mailId);
-        DeepaMehtaTransaction tx = dms.beginTx();
         try {
             Topic campaign = dms.createTopic(new TopicModel(CAMPAIGN));
             dms.createAssociation(new AssociationModel("dm4.core.association",
                     new TopicRoleModel(mailId, "dm4.core.default"),
                     new TopicRoleModel(campaign.getId(), "dm4.core.default")));
-            tx.success();
             return campaign;
         } catch (Exception e) {
             throw new RuntimeException("Starting a campaign from mail " + mailId + " FAILED", e);
-        } finally {
-            tx.finish();
         }
     }
 
@@ -189,9 +176,9 @@ public class PoemSpacePlugin extends PluginActivator {
      */
     @PUT
     @Path("/mail/{id}/send")
+    @Transactional
     public StatusReport sendCampaignMail(@PathParam("id") long mailId) {
         log.info("Sending Campaign Mail " + mailId);
-        DeepaMehtaTransaction tx = dms.beginTx();
         try {
             Topic mail = dms.getTopic(mailId);
             RelatedTopic campaign = mail.getRelatedTopic("dm4.core.association",
@@ -200,12 +187,9 @@ public class PoemSpacePlugin extends PluginActivator {
             mailService.associateValidatedRecipients(mailId, queryCampaignRecipients(campaign));
             // send and report status
             StatusReport report = mailService.send(new Mail(mailId, dms));
-            tx.success();
             return report;
         } catch (Exception e) {
             throw new RuntimeException("Sending Campaign Mail " + mailId + " FAILED", e);
-        } finally {
-            tx.finish();
         }
     }
 
