@@ -14,9 +14,9 @@ public class Migration11 extends Migration {
                 "dm4.poemspace.press", //
                 "dm4.poemspace.education", //
                 "dm4.poemspace.public" };
-        addCriteriaAssocDefs(dms, "dm4.poemspace.campaign", criteriaTypeUris);
-        addCriteriaAssocDefs(dms, "dm4.contacts.person", criteriaTypeUris);
-        addCriteriaAssocDefs(dms, "dm4.contacts.institution", criteriaTypeUris);
+        addCriteriaAssocDefs(dm4, mf, "dm4.poemspace.campaign", criteriaTypeUris);
+        addCriteriaAssocDefs(dm4, mf, "dm4.contacts.person", criteriaTypeUris);
+        addCriteriaAssocDefs(dm4, mf, "dm4.contacts.institution", criteriaTypeUris);
 
     }
 }

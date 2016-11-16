@@ -21,10 +21,10 @@ public class Migration12 extends Migration {
     public void run() {
 
         // get criteria topics
-        final Map<String, Long> projects = getIdsByValue(dms, PROJECT);
-        final Map<String, Long> years = getIdsByValue(dms, YEAR);
-        final Map<String, Long> affiliations = getIdsByValue(dms, AFFILIATION);
-        final Map<String, Long> publics = getIdsByValue(dms, PUBLIC);
+        final Map<String, Long> projects = getIdsByValue(dm4, PROJECT);
+        final Map<String, Long> years = getIdsByValue(dm4, YEAR);
+        final Map<String, Long> affiliations = getIdsByValue(dm4, AFFILIATION);
+        final Map<String, Long> publics = getIdsByValue(dm4, PUBLIC);
 
         // define mapping
         Map<String, Map<String, Long>> MAP = new HashMap<String, Map<String, Long>>();
@@ -111,29 +111,29 @@ public class Migration12 extends Migration {
             }
         });
 
-        for (Topic list : dms.getTopics(LIST, 0)) {
+        for (Topic list : dm4.getTopicsByType(LIST)) {
             String listName = list.getSimpleValue().toString();
             log.info("Reassign members of list " + listName);
             Map<String, Long> criteria = MAP.get(listName);
             if (criteria != null) {
                 // map composite value
-                ChildTopicsModel valueUpdate = new ChildTopicsModel();
+                ChildTopicsModel valueUpdate = mf.newChildTopicsModel();
                 for (String uri : criteria.keySet()) {
                     valueUpdate.addRef(uri, criteria.get(uri));
                 }
                 // update all related contacts
                 for (String contactTypeUri : CONTACT_URIS) {
-                    TopicModel model = new TopicModel(contactTypeUri);
+                    TopicModel model = mf.newTopicModel(contactTypeUri);
                     model.setChildTopicsModel(valueUpdate);
                     for (RelatedTopic contact : list.getRelatedTopics("dm4.core.association",
-                            null, null, contactTypeUri, 0)) {
+                            null, null, contactTypeUri)) {
                         log.info("Update " + listName + " Contact " + contact.getSimpleValue());
                         model.setId(contact.getId());
-                        dms.updateTopic(model);
+                        dm4.updateTopic(model);
                     }
                 }
                 // delete distribution list
-                dms.deleteTopic(list.getId());
+                dm4.deleteTopic(list.getId());
             }
         }
     }

@@ -11,7 +11,7 @@ import de.deepamehta.core.AssociationDefinition;
 import de.deepamehta.core.RelatedTopic;
 import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
-import de.deepamehta.core.service.DeepaMehtaService;
+import de.deepamehta.core.service.CoreService;
 
 public class CriteriaCache {
 
@@ -20,9 +20,9 @@ public class CriteriaCache {
     private List<Topic> types = null;
     private List<String> typeUris = null;
 
-    private final DeepaMehtaService dms;
+    private final CoreService dms;
 
-    public CriteriaCache(DeepaMehtaService dms) {
+    public CriteriaCache(CoreService dms) {
         this.dms = dms;
     }
 
@@ -38,7 +38,7 @@ public class CriteriaCache {
             log.info("Loading Poemspace Criteria Types");
             Map<String, Topic> typesByUri = new HashMap<String, Topic>();
             TopicType criteriaType = dms.getTopicType("dm4.poemspace.criteria.type");
-            for (RelatedTopic type : criteriaType.getRelatedTopics("dm4.core.association", null, null, null, 0)) {
+            for (RelatedTopic type : criteriaType.getRelatedTopics("dm4.core.association", null, null, null)) {
                 typesByUri.put(type.getUri(), type);
             }
 

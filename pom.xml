@@ -7,41 +7,49 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
 
     <name>Poem Space</name>
     <groupId>com.poemspace</groupId>
-    <artifactId>dm47-poemspace</artifactId>
-    <version>0.2</version>
+    <artifactId>dm48-poemspace</artifactId>
+    <version>0.3-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <parent>
         <groupId>de.deepamehta</groupId>
-        <artifactId>deepamehta-plugin-parent</artifactId>
-        <version>4.7</version>
+        <artifactId>deepamehta-plugin</artifactId>
+        <version>4.8</version>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-accesscontrol</artifactId>
-            <version>4.7</version>
+            <version>4.8</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
             <artifactId>deepamehta-webservice</artifactId>
-            <version>4.7</version>
+            <version>4.8</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
-            <artifactId>dm47-deepamehta-images</artifactId>
-            <version>0.9.6</version>
+            <artifactId>dm48-deepamehta-images</artifactId>
+            <version>0.9.8-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
-            <artifactId>dm47-deepamehta-mail</artifactId>
-            <version>0.3.1</version>
+            <artifactId>dm48-deepamehta-mail</artifactId>
+            <version>0.3.2</version>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <configuration>
+                    <failOnError>false</failOnError>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>

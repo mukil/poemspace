@@ -3,10 +3,10 @@ package com.poemspace.dm4;
 import java.util.HashMap;
 import java.util.Map;
 
-import de.deepamehta.core.RelatedTopic;
+import de.deepamehta.core.Topic;
 import de.deepamehta.core.TopicType;
-import de.deepamehta.core.model.AssociationDefinitionModel;
-import de.deepamehta.core.service.DeepaMehtaService;
+import de.deepamehta.core.service.CoreService;
+import de.deepamehta.core.service.ModelFactory;
 
 public class MigrationUtils {
 
@@ -20,23 +20,23 @@ public class MigrationUtils {
 
     public static String[] CONTACT_URIS     = { "dm4.contacts.person", "dm4.contacts.institution" };
 
-    public static void changeIcon(DeepaMehtaService dms, String typeUri, String iconPath) {
+    public static void changeIcon(CoreService dms, String typeUri, String iconPath) {
         dms.getTopicType(typeUri).getViewConfig()
                 .addSetting("dm4.webclient.view_config", "dm4.webclient.icon", iconPath);
     }
 
-    public static void addCriteriaAssocDefs(DeepaMehtaService dms, String typeUri,
+    public static void addCriteriaAssocDefs(CoreService dms, ModelFactory mf, String typeUri,
             String... criteriaTypeUris) {
         TopicType topicType = dms.getTopicType(typeUri);
         for (String uri : criteriaTypeUris) {
-            topicType.addAssocDef(new AssociationDefinitionModel("dm4.core.aggregation_def",//
+            topicType.addAssocDef(mf.newAssociationDefinitionModel("dm4.core.aggregation_def",//
                     typeUri, uri, "dm4.core.one", "dm4.core.many"));
         }
     }
 
-    public static Map<String, Long> getIdsByValue(DeepaMehtaService dms, String typeUri) {
+    public static Map<String, Long> getIdsByValue(CoreService dms, String typeUri) {
         HashMap<String, Long> map = new HashMap<String, Long>();
-        for (RelatedTopic topic : dms.getTopics(typeUri, 0).getItems()) {
+        for (Topic topic : dms.getTopicsByType(typeUri)) {
             map.put(topic.getSimpleValue().toString(), topic.getId());
         }
         return map;

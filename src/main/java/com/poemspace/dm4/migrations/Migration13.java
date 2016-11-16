@@ -21,8 +21,8 @@ public class Migration13 extends Migration {
     public void run() {
 
         // get criteria topics
-        final Map<String, Long> art = getIdsByValue(dms, ART);
-        final Map<String, Long> press = getIdsByValue(dms, PRESS);
+        final Map<String, Long> art = getIdsByValue(dm4, ART);
+        final Map<String, Long> press = getIdsByValue(dm4, PRESS);
 
         // define mapping
         Map<String, Map<String, Long>> MAP = new HashMap<String, Map<String, Long>>();
@@ -94,30 +94,30 @@ public class Migration13 extends Migration {
             }
         });
 
-        for (Topic criterion : dms.getTopics(ART, 0)) {
+        for (Topic criterion : dm4.getTopicsByType(ART)) {
             String criterionName = criterion.getSimpleValue().toString();
             log.info("Reassign Members of Art criterion " + criterionName);
             Map<String, Long> criteria = MAP.get(criterionName);
             if (criteria != null) {
                 // map composite value
-                ChildTopicsModel valueUpdate = new ChildTopicsModel();
+                ChildTopicsModel valueUpdate = mf.newChildTopicsModel();
                 for (String uri : criteria.keySet()) {
                     valueUpdate.addRef(uri, criteria.get(uri));
                 }
                 // update all related contacts
                 for (String contactTypeUri : CONTACT_URIS) {
-                    TopicModel model = new TopicModel(contactTypeUri);
+                    TopicModel model = mf.newTopicModel(contactTypeUri);
                     model.setChildTopicsModel(valueUpdate);
                     for (RelatedTopic contact : criterion.getRelatedTopics("dm4.core.aggregation",
-                            "dm4.core.child", "dm4.core.parent", contactTypeUri, 0)) {
+                            "dm4.core.child", "dm4.core.parent", contactTypeUri)) {
                         log.info("Update " + criterionName + " Contact " + contact.getSimpleValue());
                         model.setId(contact.getId());
-                        dms.updateTopic(model);
+                        dm4.updateTopic(model);
                     }
                 }
 
                 // delete distribution list
-                dms.deleteTopic(criterion.getId());
+                dm4.deleteTopic(criterion.getId());
             }
         }
     }
