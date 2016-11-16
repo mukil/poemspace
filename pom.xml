@@ -17,6 +17,10 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
         <version>4.8</version>
     </parent>
 
+    <properties>
+	<dm4.deploy.dir>/home/malted/Desktop/Testing/sign-up release/deepamehta-4.8.4/bundle-deploy</dm4.deploy.dir>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>de.deepamehta</groupId>
@@ -30,8 +34,8 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
-            <artifactId>dm48-deepamehta-images</artifactId>
-            <version>0.9.8-SNAPSHOT</version>
+            <artifactId>dm48-images</artifactId>
+            <version>0.9.10</version>
         </dependency>
         <dependency>
             <groupId>de.deepamehta</groupId>
