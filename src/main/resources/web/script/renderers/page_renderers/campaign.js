@@ -25,7 +25,7 @@ function getCriterionList(criteria) {
     return dm4c.restc.get_topic_related_topics(criteria.id, {
         assoc_type_uri: 'dm4.core.instantiation',
         others_role_type_uri: 'dm4.core.instance'
-    }, null, null).items.sort(function (a, b) {
+    }, null, null).sort(function (a, b) {
         return (a.value < b.value) ? -1 : (a.value > b.value) ? 1 : 0
     })
 }
@@ -36,26 +36,26 @@ function getRecipient(childId, parentUri) {
         my_role_type_uri: 'dm4.core.child',
         others_role_type_uri: 'dm4.core.parent',
         others_topic_type_uri: parentUri
-    }).items[0]
+    })[0]
     // return null
 }
 
 function getRecipientsById(campaignId, type) {
     return dm4c.restc.get_topic_related_topics(campaignId, {
         assoc_type_uri: type
-    }, null, null).items
+    }, null, null)
 }
 
 function includeRecipient(campaignId, recipientId) {
     var uri = '/poemspace/campaign/' + campaignId + '/include/' + recipientId
     console.log("POSTing include recipient", recipientId, campaignId)
-    return dm4c.restc.request('POST', uri).items
+    return dm4c.restc.request('POST', uri)
 }
 
 function excludeRecipient(campaignId, recipientId) {
     var uri = '/poemspace/campaign/' + campaignId + '/exclude/' + recipientId
     console.log("POSTing exclude recipient", recipientId, campaignId)
-    return dm4c.restc.request('POST', uri).items
+    return dm4c.restc.request('POST', uri)
 }
 
 function createCriteriaFieldset(criteria, aggregates) {
@@ -98,7 +98,7 @@ function onRemoveInclude() {
         campaignId = dm4c.selected_object.id,
         includes = dm4c.restc.get_associations(campaignId, recipientId, 'dm4.poemspace.campaign.adds')
     $.each(includes, function (i, include) {
-        dm4c.do_delete_association(include)
+        dm4c.do_delete_association(include.id)
     })
     excludeRecipient(campaignId, recipientId)
     refreshRecipients()
@@ -118,7 +118,7 @@ function onRemoveExclude() {
             campaignId = dm4c.selected_object.id,
             excludes = dm4c.restc.get_associations(campaignId, recipientId, 'dm4.poemspace.campaign.excl')
     $.each(excludes, function (i, exclude) {
-        dm4c.do_delete_association(exclude)
+        dm4c.do_delete_association(exclude.id)
     })
     refreshRecipients()
 }

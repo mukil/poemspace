@@ -30,7 +30,7 @@ dm4c.add_plugin('dm4.poemspace.plugin', function () {
 
     function isCampaignMail(mailId) {
         var campaigns = getCampaignsOfMail(mailId)
-        if (campaigns.total_count === 0) {
+        if (campaigns.length === 0) {
             return false
         } else {
             return true
@@ -72,12 +72,12 @@ dm4c.add_plugin('dm4.poemspace.plugin', function () {
 
     function copyCampaignMail() {
         var campaigns = getCampaignsOfMail(dm4c.selected_object.id)
-        if (campaigns.total_count > 0) { // campaign mail
+        if (campaigns.length > 0) { // campaign mail
             var mail = dm4c.restc.request('POST', '/mail/' + dm4c.selected_object.id + '/copy?recipients=false')
             dm4c.restc.create_association({
                 type_uri: 'dm4.core.association',
                 role_1: {topic_id: mail.id, role_type_uri: 'dm4.core.default'},
-                role_2: {topic_id: campaigns.items[0].id, role_type_uri: 'dm4.core.default'}
+                role_2: {topic_id: campaigns[0].id, role_type_uri: 'dm4.core.default'}
             })
             return mail
         }
@@ -85,8 +85,8 @@ dm4c.add_plugin('dm4.poemspace.plugin', function () {
 
     function showCampaignMail() {
         var campaigns = getCampaignsOfMail(dm4c.selected_object.id)
-        if (campaigns.total_count > 0) { // campaign mail
-            dm4c.do_reveal_related_topic(campaigns.items[0].id, 'show')
+        if (campaigns.length > 0) { // campaign mail
+            dm4c.do_reveal_related_topic(campaigns[0].id, 'show')
         }
     }
 
@@ -102,12 +102,12 @@ dm4c.add_plugin('dm4.poemspace.plugin', function () {
 
     function renderMailRecipients() {
         var campaigns = getCampaignsOfMail(dm4c.selected_object.id)
-        if (campaigns.total_count > 0) { // campaign mail
+        if (campaigns.length > 0) { // campaign mail
             var recipients = getMailRecipients(dm4c.selected_object.id)
-            if (recipients.total_count > 0) { // campaign mail with recipients => sended
-                return $('<span>').text(recipients.total_count + ' recipients')
+            if (recipients.length > 0) { // campaign mail with recipients => sended
+                return $('<span>').text(recipients.length + ' recipients')
             } else {
-                return $('<span>').text(getCampaignRecipientCount(campaigns.items[0].id) + ' recipients')
+                return $('<span>').text(getCampaignRecipientCount(campaigns[0].id) + ' recipients')
             }
         }
     }
