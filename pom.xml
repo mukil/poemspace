@@ -17,9 +17,9 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
         <version>4.8</version>
     </parent>
 
-    <properties>
+    <!--properties>
 	<dm4.deploy.dir>/home/malted/Desktop/Testing/sign-up release/deepamehta-4.8.4/bundle-deploy</dm4.deploy.dir>
-    </properties>
+    </properties-->
 
     <dependencies>
         <dependency>
