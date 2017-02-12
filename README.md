@@ -1,10 +1,7 @@
-# Poemspace - DeepaMehta 4 Plugin
+Poemspace - DeepaMehta 4 Plugin
+###############################
 
-Poemspace is an application for contact management and email distribution
-in the field of arts and culture. A mailing is addressed to a
-arbitrary combination of single contacts and dynamic filter results.
-Contacts are categorized by e.g. arts genre and kind of venue.
-The categories themself are configurable by the user.
+Poemspace is an application for contact management and email distribution in the field of arts and culture. A mailing is addressed to a arbitrary combination of single contacts and dynamic filter results. Contacts are categorized by e.g. arts genre and kind of venue. The categories themself are configurable by the user.
 
 ## Requirements
 
@@ -42,15 +39,17 @@ reload the webclient page in the web browser.
 
 ## plugin development
 
-TBD. You can start adapting the source code of this plugin by following the paragraph on plugin development in this [README](https://github.com/mukil/dm4-kiezatlas-angebote#usage--development) while replacing the names of the bundles this plugin depends on (dm4-images, dm4-mail).
+TBD. You can start adapting the source code of this plugin by following the paragraph on plugin development in this [README](https://github.com/mukil/dm4-kiezatlas-angebote#usage--development) while replacing the names in that examples with the dependencys of this particular plugin (dm4-images, dm4-mail).
+
+To build this bundle from source you must build and install the dm4 plugins this plugin declares dependend on locally on your machine (as these are not distributed via maven central). You can do so after checking out the respective plugins on github and using `mvn clean install`.
 
 ### changelog
 
-**0.3**, Dec 20, 2016
+**0.3**, Feb 12, 2017
 
 - Adapted to be compatible with DeepaMehta 4.8
-- A usability issue exists cause by the dm4-cache module:<br/>
-  After updating criterias to be included in a "Campaign" one _needs_ to select any other topic and re-select the "Campaign" to see and edit its up-to-date state. Disabling the dm4-cache module should work around this issue.
+- An usability issue remains:<br/>
+  After updating the criterias of a "Campaign" topic one _needs_ to select any other topic and re-select the "Campaign" to see and edit its up-to-date state. Disable the dm4-cache module and this will not be an isseu.
 
 **0.2**, Apr 26, 2016
 

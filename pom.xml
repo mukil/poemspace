@@ -8,7 +8,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/ma
     <name>Poem Space</name>
     <groupId>com.poemspace</groupId>
     <artifactId>dm48-poemspace</artifactId>
-    <version>0.3-SNAPSHOT</version>
+    <version>0.3</version>
     <packaging>bundle</packaging>
 
     <parent>
